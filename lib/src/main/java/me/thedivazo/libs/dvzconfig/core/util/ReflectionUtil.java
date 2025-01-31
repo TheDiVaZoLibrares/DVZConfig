@@ -1,4 +1,4 @@
-package me.thedivazo.library.dvzconfig.core.util;
+package me.thedivazo.libs.dvzconfig.core.util;
 
 import java.util.Arrays;
 

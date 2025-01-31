@@ -1,0 +1,23 @@
+plugins {
+    id 'java-library'
+}
+
+group = 'me.thedivazo.libs.dvzconfig.yaml'
+version = 'unspecified'
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+}
+
+dependencies {
+    compileOnly project(":lib")
+    implementation 'org.spongepowered:configurate-yaml:4.1.1'
+
+    testImplementation platform('org.junit:junit-bom:5.10.0')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+}
+
+test {
+    useJUnitPlatform()
+}

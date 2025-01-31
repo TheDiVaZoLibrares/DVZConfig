@@ -1,4 +1,4 @@
-package me.thedivazo.library.dvzconfig.core.serializer;
+package me.thedivazo.libs.dvzconfig.core.serializer;
 
 import org.spongepowered.configurate.ConfigurationNode;
 import org.spongepowered.configurate.objectmapping.ObjectMapper;
@@ -13,13 +13,13 @@ import java.util.function.Function;
  * @author TheDiVaZo
  * created on 31.01.2025
  */
-public class ClassForIdSerializer<K, T> implements TypeSerializer<T> {
+public class ClassForFieldSerializer<K, T> implements TypeSerializer<T> {
     private final Object[] fieldIdPath;
     private final Class<K> fieldIdValueClass;
     private final Function<T, K> fieldIdValueExtractor;
     private final Map<K, Class<? extends T>> fieldNodeValueClassContainer;
 
-    public ClassForIdSerializer(Object[] fieldIdPath, Class<K> fieldIdValueClass, Function<T, K> fieldIdValueExtractor, Map<K, Class<? extends T>> fieldNodeValueClassContainer) {
+    public ClassForFieldSerializer(Object[] fieldIdPath, Class<K> fieldIdValueClass, Function<T, K> fieldIdValueExtractor, Map<K, Class<? extends T>> fieldNodeValueClassContainer) {
         this.fieldIdPath = fieldIdPath;
         this.fieldIdValueClass = fieldIdValueClass;
         this.fieldIdValueExtractor = fieldIdValueExtractor;

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="GradleMigrationSettings" migrationVersion="1" />
   <component name="GradleSettings">
     <option name="linkedExternalProjectsSettings">
       <GradleProjectSettings>
@@ -7,7 +8,12 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/config-yaml" />
             <option value="$PROJECT_DIR$/lib" />
+            <option value="$PROJECT_DIR$/platform-bukkit" />
+            <option value="$PROJECT_DIR$/platform-bukkit-api" />
+            <option value="$PROJECT_DIR$/platform-paper-1-21-1" />
+            <option value="$PROJECT_DIR$/tem1" />
           </set>
         </option>
       </GradleProjectSettings>

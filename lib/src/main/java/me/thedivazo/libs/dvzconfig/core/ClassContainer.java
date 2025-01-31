@@ -1,4 +1,4 @@
-package me.thedivazo.library.dvzconfig.core;
+package me.thedivazo.libs.dvzconfig.core;
 
 import java.util.Map;
 

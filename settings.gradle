@@ -12,3 +12,9 @@ plugins {
 
 rootProject.name = 'DVZConfig'
 include('lib')
+include 'config-yaml'
+include 'platform-bukkit'
+include 'platform-bukkit-api'
+include 'tem1'
+include 'platform-paper-1-21-1'
+

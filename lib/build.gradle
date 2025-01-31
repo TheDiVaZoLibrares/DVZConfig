@@ -19,11 +19,12 @@ repositories {
 }
 
 dependencies {
-    api 'org.spongepowered:configurate-core:4.1.2'
-    compileOnly 'io.papermc.paper:paper-api:1.21.4-R0.1-SNAPSHOT'
+    implementation("com.google.guava:guava:33.4.0-jre")
+    api 'org.spongepowered:configurate-core:4.1.1'
+//    compileOnly 'io.papermc.paper:paper-api:1.21.4-R0.1-SNAPSHOT'
 
-//    testImplementation libs.junit.jupiter
-//    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+//    testImplementation platform('org.junit:junit-bom:5.10.0')
+//    testImplementation 'org.junit.jupiter:junit-jupiter'
 }
 
 java {
@@ -32,6 +33,6 @@ java {
     }
 }
 
-tasks.named('test') {
+//test {
 //    useJUnitPlatform()
-}
+//}
