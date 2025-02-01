@@ -8,18 +8,19 @@ import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 
 import java.util.Map;
 
+//TODO: Сделать реализацию по умлочанию
 public class TextColorSerializer extends ColorSerializer<TextColor> {
     public TextColorSerializer(Map<String, Integer> colorNamesModel) {
         super(TypeToken.get(TextColor.class), colorNamesModel);
     }
 
     @Override
-    protected TextColor fromRgba(int rgba) {
-        return TextColor.color(rgba);
+    protected TextColor fromARGB(int argb) {
+        return TextColor.color(argb);
     }
 
     @Override
-    protected int fromColor(TextColor color) {
+    protected int toARGB(TextColor color) {
         return color.value();
     }
 }

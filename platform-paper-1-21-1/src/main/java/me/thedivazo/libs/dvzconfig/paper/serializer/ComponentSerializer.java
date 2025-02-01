@@ -1,22 +1,33 @@
 package me.thedivazo.libs.dvzconfig.paper.serializer;
 
 import net.kyori.adventure.text.Component;
-import org.checkerframework.checker.nullness.qual.Nullable;
-import org.spongepowered.configurate.ConfigurationNode;
+import net.kyori.adventure.text.minimessage.MiniMessage;
+import org.spongepowered.configurate.serialize.ScalarSerializer;
 import org.spongepowered.configurate.serialize.SerializationException;
-import org.spongepowered.configurate.serialize.TypeSerializer;
 
 import java.lang.reflect.Type;
+import java.util.function.Predicate;
 
-//TODO: Реализовать сериализацию компонента. На этом можно и закончить.
-public class ComponentSerializer implements TypeSerializer<Component> {
-    @Override
-    public Component deserialize(Type type, ConfigurationNode node) throws SerializationException {
-        return null;
+/**
+ * https://docs.advntr.dev/minimessage/format.html#minimessage-format
+ */
+public class ComponentSerializer extends ScalarSerializer<Component> {
+    public static final ComponentSerializer DEFAULT =  new ComponentSerializer(MiniMessage.miniMessage());
+
+    private final MiniMessage miniMessage;
+
+    protected ComponentSerializer(MiniMessage miniMessage) {
+        super(Component.class);
+        this.miniMessage = miniMessage;
     }
 
     @Override
-    public void serialize(Type type, @Nullable Component obj, ConfigurationNode node) throws SerializationException {
-        return;
+    public Component deserialize(Type type, Object obj) throws SerializationException {
+        return miniMessage.deserialize(obj.toString());
+    }
+
+    @Override
+    protected Object serialize(Component item, Predicate<Class<?>> typeSupported) {
+        return miniMessage.serialize(item);
     }
 }

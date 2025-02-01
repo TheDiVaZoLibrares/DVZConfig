@@ -24,14 +24,10 @@ public abstract class ColorSerializer<C> extends ScalarSerializer<C> {
     private static final char HEX_CHARACTER = '#';
 
     protected final Map<String, Integer> colorNamesModel;
-    protected final Map<Integer, C> cachedColors;
 
     protected ColorSerializer(TypeToken<C> type, Map<String, Integer> colorNamesModel) {
         super(type);
         this.colorNamesModel = Map.copyOf(colorNamesModel);
-        this.cachedColors = colorNamesModel.values().stream()
-                .map(integer -> Map.entry(integer, fromRgba(integer)))
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
     protected OptionalInt optionalDecode(String str) {
@@ -56,22 +52,28 @@ public abstract class ColorSerializer<C> extends ScalarSerializer<C> {
         int rgba = Optional
                 .ofNullable(rgbaOrNull)
                 .orElseThrow(() -> new SerializationException("Could not deserialize color from string: " + str));
-        return Optional
-                .ofNullable(cachedColors.get(rgba))
-                .orElseGet(()-> fromRgba(rgba));
+        return fromARGB(rgba);
     }
     @Override
     protected Object serialize(C item, Predicate<Class<?>> typeSupported) {
         final int rgbLength = 6;
         final int rgbaLength = 8;
 
-        int rgba = fromColor(item);
+        int rgba = toARGB(item);
         String hex = Integer.toHexString(rgba);
         int minLength = hex.length() <= rgbLength ? rgbLength : rgbaLength;
 
         return HEX_CHARACTER + Strings.padEnd(Integer.toHexString(rgba), minLength, '0');
     }
 
-    protected abstract C fromRgba(int rgba);
-    protected abstract int fromColor(C color);
+    /**
+     * i << 24 - alpha
+     * i << 16 - red
+     * i << 8 - green
+     * i << 0 - blue
+     * @param argb
+     * @return
+     */
+    protected abstract C fromARGB(int argb);
+    protected abstract int toARGB(C color);
 }
