@@ -1,15 +1,13 @@
 package me.thedivazo.libs.dvzconfig.yaml;
 
-import me.thedivazo.libs.dvzconfig.core.ConfigLoader;
+import me.thedivazo.libs.dvzconfig.core.config.ConfigLoader;
 import org.spongepowered.configurate.CommentedConfigurationNode;
 import org.spongepowered.configurate.loader.ConfigurationLoader;
-import org.spongepowered.configurate.loader.HeaderMode;
 import org.spongepowered.configurate.serialize.TypeSerializerCollection;
 import org.spongepowered.configurate.yaml.NodeStyle;
 import org.spongepowered.configurate.yaml.YamlConfigurationLoader;
 
 import java.nio.file.Path;
-import java.util.Arrays;
 
 /**
  * @author TheDiVaZo

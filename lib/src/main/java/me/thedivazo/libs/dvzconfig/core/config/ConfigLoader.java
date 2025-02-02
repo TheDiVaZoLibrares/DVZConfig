@@ -1,13 +1,11 @@
-package me.thedivazo.libs.dvzconfig.core;
+package me.thedivazo.libs.dvzconfig.core.config;
 
 import org.spongepowered.configurate.CommentedConfigurationNode;
 import org.spongepowered.configurate.ConfigurateException;
 import org.spongepowered.configurate.loader.ConfigurationLoader;
-import org.spongepowered.configurate.serialize.SerializationException;
 import org.spongepowered.configurate.serialize.TypeSerializerCollection;
 
 import java.nio.file.Path;
-import java.util.function.Supplier;
 
 /**
  * @author TheDiVaZo

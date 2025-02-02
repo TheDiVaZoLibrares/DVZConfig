@@ -7,6 +7,7 @@
 
 plugins {
     id 'java-library'
+    id 'org.checkerframework' version '0.6.48'
 }
 
 repositories {
@@ -31,6 +32,13 @@ java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(21)
     }
+}
+
+checkerFramework {
+    checkers = [
+            'org.checkerframework.checker.nullness.NullnessChecker',
+            'org.checkerframework.checker.index.IndexChecker'
+    ]
 }
 
 //test {
