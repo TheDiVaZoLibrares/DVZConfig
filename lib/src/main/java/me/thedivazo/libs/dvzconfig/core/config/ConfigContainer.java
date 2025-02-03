@@ -1,27 +1,25 @@
 package me.thedivazo.libs.dvzconfig.core.config;
 
-import org.checkerframework.checker.index.qual.PolyIndex;
+import me.thedivazo.libs.dvzconfig.core.container.ClassToValueContainer;
+import me.thedivazo.libs.dvzconfig.core.container.ConfigWrapperMutableContainer;
 
-import java.util.HashMap;
 import java.util.Map;
 
 /**
  * @author TheDiVaZo
  * created on 02.02.2025
  */
-public class ConfigContainer {
+public class ConfigContainer implements ClassToValueContainer<ConfigWrapper<?>> {
     private final Map<Class<?>, ConfigWrapper<?>> container;
 
-    private ConfigContainer(Map<Class<?>, ConfigWrapper<?>> container) {
-        this.container = Map.copyOf(container);
-        container.put(Integer.class, new ConfigWrapper<>(null, null, Integer.class));
+    private ConfigContainer(ConfigWrapperMutableContainer container) {
+        this.container = Map.copyOf(container.getContainer());
     }
 
     public void loadAll() {
         for (ConfigWrapper<?> value : container.values()) {
             value.loadOrCreate();
         }
-        new ConfigContainer(Map.of());
     }
 
     @SuppressWarnings("unchecked")

@@ -10,7 +10,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 /**
  * @author TheDiVaZo
@@ -21,13 +20,11 @@ import java.util.stream.Collectors;
  * Либо в текстовом формате названия цвета -> red, green, blue
  */
 public abstract class ColorSerializer<C> extends ScalarSerializer<C> {
-    private static final char HEX_CHARACTER = '#';
+    protected final Map<String, Integer> colorNamesToRgbaModel;
 
-    protected final Map<String, Integer> colorNamesModel;
-
-    protected ColorSerializer(TypeToken<C> type, Map<String, Integer> colorNamesModel) {
+    protected ColorSerializer(TypeToken<C> type, Map<String, Integer> colorNamesToRgbaModel) {
         super(type);
-        this.colorNamesModel = Map.copyOf(colorNamesModel);
+        this.colorNamesToRgbaModel = Map.copyOf(colorNamesToRgbaModel);
     }
 
     protected OptionalInt optionalDecode(String str) {
@@ -38,6 +35,17 @@ public abstract class ColorSerializer<C> extends ScalarSerializer<C> {
         }
     }
 
+    protected String serialize(int argb) {
+        final char HEX_CHARACTER = '#';
+        final int rgbLength = 6;
+        final int rgbaLength = 8;
+
+        String hex = Integer.toHexString(argb);
+        int minLength = hex.length() <= rgbLength ? rgbLength : rgbaLength;
+
+        return HEX_CHARACTER + Strings.padEnd(Integer.toHexString(argb), minLength, '0');
+    }
+
     @Override
     public C deserialize(Type type, Object obj) throws SerializationException {
         String str = obj.toString();
@@ -46,7 +54,7 @@ public abstract class ColorSerializer<C> extends ScalarSerializer<C> {
         if (optionalInt.isPresent()) {
             rgbaOrNull = optionalInt.getAsInt();
         } else {
-            rgbaOrNull = colorNamesModel.get(str);
+            rgbaOrNull = colorNamesToRgbaModel.get(str);
         }
 
         int rgba = Optional
@@ -56,14 +64,8 @@ public abstract class ColorSerializer<C> extends ScalarSerializer<C> {
     }
     @Override
     protected Object serialize(C item, Predicate<Class<?>> typeSupported) {
-        final int rgbLength = 6;
-        final int rgbaLength = 8;
-
         int rgba = toARGB(item);
-        String hex = Integer.toHexString(rgba);
-        int minLength = hex.length() <= rgbLength ? rgbLength : rgbaLength;
-
-        return HEX_CHARACTER + Strings.padEnd(Integer.toHexString(rgba), minLength, '0');
+        return serialize(rgba);
     }
 
     /**

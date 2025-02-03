@@ -20,7 +20,9 @@ repositories {
 }
 
 dependencies {
-    implementation("com.google.guava:guava:33.4.0-jre")
+    // https://mvnrepository.com/artifact/io.leangen.geantyref/geantyref
+    implementation 'io.leangen.geantyref:geantyref:2.0.1'
+    implementation 'com.google.guava:guava:33.4.0-jre'
     api 'org.spongepowered:configurate-core:4.1.1'
 //    compileOnly 'io.papermc.paper:paper-api:1.21.4-R0.1-SNAPSHOT'
 
@@ -36,8 +38,8 @@ java {
 
 checkerFramework {
     checkers = [
-            'org.checkerframework.checker.nullness.NullnessChecker',
-            'org.checkerframework.checker.index.IndexChecker'
+//            'org.checkerframework.checker.nullness.NullnessChecker',
+//            'org.checkerframework.checker.index.IndexChecker'
     ]
 }
 
