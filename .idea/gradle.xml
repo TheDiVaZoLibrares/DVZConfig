@@ -9,11 +9,9 @@
           <set>
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/config-yaml" />
-            <option value="$PROJECT_DIR$/lib" />
-            <option value="$PROJECT_DIR$/platform-bukkit" />
-            <option value="$PROJECT_DIR$/platform-bukkit-api" />
-            <option value="$PROJECT_DIR$/platform-paper-1-21-1" />
-            <option value="$PROJECT_DIR$/tem1" />
+            <option value="$PROJECT_DIR$/core" />
+            <option value="$PROJECT_DIR$/platform-paper" />
+            <option value="$PROJECT_DIR$/platform-spigot" />
           </set>
         </option>
       </GradleProjectSettings>
