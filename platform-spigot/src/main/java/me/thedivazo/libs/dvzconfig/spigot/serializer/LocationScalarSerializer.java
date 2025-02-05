@@ -24,7 +24,7 @@ public class LocationScalarSerializer extends ScalarSerializer<Location> {
 
     //Эта хрень должна согласовываться с LOCATION_PATTERN_STR
     private static final String WORLD_FORMAT_CHUNK = "%s:";
-    private static final String COORDINATE_FORMAT_CHUNK = "%f:%f:%f";
+    private static final String COORDINATES_FORMAT_CHUNK = "%f:%f:%f";
     private static final String ROTATION_COORD_FORMAT_CHUNK = "|%f:%f";
 
     //Не забыть: При изменении LOCATION_PATTERN_STR нужно так-же менять все номера групп в соответствии с номером в LOCATION_PATTERN_STR
@@ -90,7 +90,7 @@ public class LocationScalarSerializer extends ScalarSerializer<Location> {
             stringBuilder.append(String.format(WORLD_FORMAT_CHUNK, item.getWorld().getName()));
         }
 
-        stringBuilder.append(String.format(COORDINATE_FORMAT_CHUNK, item.getX(), item.getY(), item.getZ()));
+        stringBuilder.append(String.format(COORDINATES_FORMAT_CHUNK, item.getX(), item.getY(), item.getZ()));
 
         if (item.getYaw()!= 0 || item.getPitch()!= 0) {
             stringBuilder.append(String.format(ROTATION_COORD_FORMAT_CHUNK, item.getYaw(), item.getPitch()));
