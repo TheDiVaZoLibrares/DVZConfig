@@ -16,7 +16,7 @@ public class ComponentSerializer extends ScalarSerializer<Component> {
 
     private final MiniMessage miniMessage;
 
-    protected ComponentSerializer(MiniMessage miniMessage) {
+    public ComponentSerializer(MiniMessage miniMessage) {
         super(Component.class);
         this.miniMessage = miniMessage;
     }

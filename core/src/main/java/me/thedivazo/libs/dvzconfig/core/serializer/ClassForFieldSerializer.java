@@ -1,6 +1,7 @@
 package me.thedivazo.libs.dvzconfig.core.serializer;
 
 import com.google.common.collect.*;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.configurate.ConfigurationNode;
 import org.spongepowered.configurate.objectmapping.ObjectMapper;
 import org.spongepowered.configurate.serialize.SerializationException;
@@ -61,7 +62,7 @@ public final class ClassForFieldSerializer<K, T> implements TypeSerializer<T> {
 
     @Override
     @SuppressWarnings("unchecked")
-    public void serialize(Type type, T obj, ConfigurationNode node) throws SerializationException {
+    public void serialize(Type type, @Nullable T obj, ConfigurationNode node) throws SerializationException {
         if (obj == null) {
             throw new SerializationException("Could not serialize object, because object is null");
         }

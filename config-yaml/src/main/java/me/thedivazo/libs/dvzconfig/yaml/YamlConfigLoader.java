@@ -14,14 +14,21 @@ import java.nio.file.Path;
  * created on 31.01.2025
  */
 public class YamlConfigLoader<T> extends ConfigLoader<T> {
+    private static final YamlConfigLoader<?> DEFAULT = new YamlConfigLoader<>(NodeStyle.BLOCK, 4);
+
     private final int indent;
     private final NodeStyle nodeStyle;
 
-    public static <T> YamlConfigLoader<T> getConfigLoader(TypeSerializerCollection[] serializerCollections) {
-        return new YamlConfigLoader<>(serializerCollections, 4, NodeStyle.BLOCK);
+    @SuppressWarnings("unchecked")
+    public static <T> YamlConfigLoader<T> getConfigLoader() {
+        return (YamlConfigLoader<T>) DEFAULT;
     }
 
-    public YamlConfigLoader(TypeSerializerCollection[] serializerCollections, int indent, NodeStyle nodeStyle) {
+    public static <T> YamlConfigLoader<T> getConfigLoader(TypeSerializerCollection... serializerCollections) {
+        return new YamlConfigLoader<>(NodeStyle.BLOCK, 4, serializerCollections);
+    }
+
+    public YamlConfigLoader(NodeStyle nodeStyle, int indent, TypeSerializerCollection... serializerCollections) {
         super(serializerCollections);
         this.indent = indent;
         this.nodeStyle = nodeStyle;

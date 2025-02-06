@@ -49,11 +49,7 @@ class ConfigManagerTest {
         );
 
         yamlConfigLoader = new YamlConfigLoader<>(
-                new TypeSerializerCollection[]{
-                        TypeSerializerCollection.defaults().childBuilder().register(Animal.class, animalNameSerializer).build(),
-                },
-                4,
-                NodeStyle.BLOCK
+                NodeStyle.BLOCK, 4, TypeSerializerCollection.defaults().childBuilder().register(Animal.class, animalNameSerializer).build()
         );
 
         configurationLoader = yamlConfigLoader.getLoader(path);

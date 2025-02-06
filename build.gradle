@@ -1,0 +1,67 @@
+plugins {
+    id 'com.gradleup.shadow' version "9.0.0-beta7"
+    id 'org.cadixdev.licenser' version '0.6.1' apply false
+    id 'org.checkerframework' version '0.6.48' apply false
+    id 'maven-publish'
+    id 'java'
+}
+
+group = 'me.thedivazo.libs.dvzconfig'
+version = 'unspecified'
+
+allprojects {
+    apply plugin: 'java'
+    apply plugin: 'com.gradleup.shadow'
+    apply plugin: 'org.cadixdev.licenser'
+
+    compileJava.options.encoding = 'UTF-8'
+    //compileJava.options.compilerArgs += ['-Xlint:unchecked', '-Xlint:deprecation']
+    compileJava.options.release.set 21
+    javadoc.options.encoding = 'UTF-8'
+
+    repositories {
+        mavenLocal()
+        mavenCentral()
+        maven { url 'https://jitpack.io' }
+        maven { url 'https://repo.papermc.io/repository/maven-public/' }
+        maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
+        maven { url 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/' }
+        maven { url "https://repo.dmulloy2.net/repository/public/" }
+    }
+
+    license {
+        header = rootProject.file('HEADER')
+        include '**/*.java'
+        newLine = true
+    }
+}
+
+subprojects {
+    apply plugin: 'org.checkerframework'
+
+    if (['test'].contains(project.name)) return;
+
+    version rootProject.version
+    archivesBaseName = "${rootProject.name}-${project.name.capitalize()}"
+
+    dependencies {
+        checkerFramework 'org.checkerframework:checker:3.49.0'
+        implementation 'org.checkerframework:checker-qual:3.49.0'
+    }
+
+    checkerFramework {
+        checkers = [
+            'org.checkerframework.checker.nullness.NullnessChecker',
+            'org.checkerframework.checker.index.IndexChecker'
+        ]
+    }
+
+    jar {
+        from '../LICENSE'
+    }
+
+    shadowJar {
+        destinationDirectory.set(file("$rootDir/target"))
+        archiveClassifier.set('')
+    }
+}

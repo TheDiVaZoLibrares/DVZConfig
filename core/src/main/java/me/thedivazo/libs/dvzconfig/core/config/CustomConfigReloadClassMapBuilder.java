@@ -11,7 +11,7 @@ import java.util.function.Supplier;
  * created on 03.02.2025
  */
 public class CustomConfigReloadClassMapBuilder extends ClassMapBuilder<Consumer<? super ConfigWrapper<?>>> {
-    protected CustomConfigReloadClassMapBuilder(Supplier<Map<Class<?>, Consumer<? super ConfigWrapper<?>>>> supplier) {
+    public CustomConfigReloadClassMapBuilder(Supplier<Map<Class<?>, Consumer<? super ConfigWrapper<?>>>> supplier) {
         super(supplier);
     }
 

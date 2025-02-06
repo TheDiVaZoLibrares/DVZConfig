@@ -17,8 +17,8 @@ public final class ConfigWrapper<T> {
     private final T defaultConfig;
     private Class<? extends T> configClass;
 
-    public ConfigWrapper(@Nullable Path pathToFile,@Nullable ConfigLoader<T> configLoader, T defaultConfig) {
-        if (!ReflectionUtil.hasAnnotation(defaultConfig.getClass(), ConfigSerializable.class)) {
+    public ConfigWrapper(Path pathToFile, ConfigLoader<T> configLoader, T defaultConfig) {
+        if (defaultConfig == null || !ReflectionUtil.hasAnnotation(defaultConfig.getClass(), ConfigSerializable.class)) {
             throw new IllegalArgumentException("Config class has not have @ConfigSerializable annotation");
         }
         else if (!ReflectionUtil.hasEmptyConstructor(defaultConfig.getClass())) {
@@ -28,6 +28,7 @@ public final class ConfigWrapper<T> {
         this.configLoader = configLoader;
         this.configClass = (Class<? extends T>) defaultConfig.getClass();
         this.defaultConfig = defaultConfig;
+        this.actualConfig = defaultConfig;
     }
 
     public void updatePath(Path newPath) {
@@ -51,7 +52,7 @@ public final class ConfigWrapper<T> {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (o == null || getClass() != o.getClass()) return false;
 
         ConfigWrapper<?> that = (ConfigWrapper<?>) o;

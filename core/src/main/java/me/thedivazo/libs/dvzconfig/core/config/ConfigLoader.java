@@ -6,6 +6,8 @@ import org.spongepowered.configurate.loader.ConfigurationLoader;
 import org.spongepowered.configurate.serialize.TypeSerializerCollection;
 
 import java.nio.file.Path;
+import java.util.Arrays;
+import java.util.Objects;
 
 /**
  * @author TheDiVaZo
@@ -15,10 +17,13 @@ public abstract class ConfigLoader<T> {
     protected final TypeSerializerCollection[] serializerCollections;
 
     protected ConfigLoader(TypeSerializerCollection[] serializerCollections) {
-        this.serializerCollections = serializerCollections;
+        this.serializerCollections = Arrays.copyOf(serializerCollections, serializerCollections.length);
     }
 
     public T load(Path pathToFile, T defaultValue) {
+        if (defaultValue == null) {
+            throw new IllegalArgumentException("default config is null");
+        }
         try {
             ConfigurationLoader<CommentedConfigurationNode> loader = getLoader(pathToFile);
             CommentedConfigurationNode node = loader.load();
@@ -34,6 +39,9 @@ public abstract class ConfigLoader<T> {
     }
 
     public void save(Path pathToFile, T config) {
+        if (config == null) {
+            throw new IllegalArgumentException("default config is null");
+        }
         try {
             ConfigurationLoader<CommentedConfigurationNode> loader = getLoader(pathToFile);
             CommentedConfigurationNode node = loader.load();

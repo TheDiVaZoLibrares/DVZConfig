@@ -2,14 +2,6 @@ plugins {
     id 'java-library'
 }
 
-group = 'me.thedivazo.libs.dvzconfig.yaml'
-version = 'unspecified'
-
-repositories {
-    mavenLocal()
-    mavenCentral()
-}
-
 dependencies {
     compileOnly project(":core")
     api 'org.spongepowered:configurate-yaml:4.1.1'

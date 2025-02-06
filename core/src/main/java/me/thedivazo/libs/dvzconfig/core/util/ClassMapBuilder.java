@@ -1,5 +1,7 @@
 package me.thedivazo.libs.dvzconfig.core.util;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
+
 import java.util.Map;
 import java.util.function.Supplier;
 
@@ -9,7 +11,7 @@ import java.util.function.Supplier;
  *
  * Чтобы помнять назначение этого класса, рекомендуеться посмотреть его наследников
  */
-public abstract class ClassMapBuilder<V> implements MapBuilder<Class<?>, V> {
+public abstract class ClassMapBuilder<V extends @NonNull Object> implements MapBuilder<Class<?>, V> {
     protected final Map<Class<?>, V> container;
 
     protected ClassMapBuilder(Supplier<Map<Class<?>, V>> supplier) {
