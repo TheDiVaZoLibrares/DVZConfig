@@ -13,11 +13,4 @@ repositories {
 dependencies {
     compileOnly project(":core")
     api 'org.spongepowered:configurate-yaml:4.1.1'
-
-    testImplementation platform('org.junit:junit-bom:5.10.0')
-    testImplementation 'org.junit.jupiter:junit-jupiter'
-}
-
-test {
-    useJUnitPlatform()
 }

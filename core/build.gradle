@@ -22,15 +22,6 @@ repositories {
 dependencies {
     api 'com.google.guava:guava:33.4.0-jre'
     api 'org.spongepowered:configurate-core:4.1.1'
-
-    testImplementation project(':config-yaml')
-    testImplementation 'org.spongepowered:configurate-core:4.1.1'
-    testImplementation 'org.mockito:mockito-core:5.0.0'
-    testImplementation platform('org.junit:junit-bom:5.10.0')
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
-    testCompileOnly 'org.projectlombok:lombok:1.18.36'
-    testAnnotationProcessor 'org.projectlombok:lombok:1.18.36'
 }
 
 java {
@@ -44,8 +35,4 @@ checkerFramework {
 //            'org.checkerframework.checker.nullness.NullnessChecker',
 //            'org.checkerframework.checker.index.IndexChecker'
     ]
-}
-
-test {
-    useJUnitPlatform()
 }

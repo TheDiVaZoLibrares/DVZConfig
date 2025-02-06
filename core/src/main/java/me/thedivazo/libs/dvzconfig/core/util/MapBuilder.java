@@ -7,5 +7,5 @@ import java.util.Map;
  * created on 03.02.2025
  */
 public interface MapBuilder<K, V> {
-    Map<Class<?>, V> builder();
+    Map<K, V> builder();
 }

@@ -1,6 +1,8 @@
 package me.thedivazo.libs.dvzconfig.core.config;
 
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * @author TheDiVaZo
@@ -9,13 +11,13 @@ import java.util.Map;
 public class ConfigContainer {
     private final Map<Class<?>, ConfigWrapper<?>> container;
 
-    private ConfigContainer(ConfigWrapperClassMapBuilder container) {
-        this.container = Map.copyOf(container.builder());
+    public ConfigContainer(Set<ConfigWrapper<?>> configWrappers) {
+        this.container = configWrappers.stream().collect(Collectors.toMap(ConfigWrapper::getConfigClass, configWrapper -> configWrapper));
     }
 
     public void loadAll() {
         for (ConfigWrapper<?> value : container.values()) {
-            value.loadOrCreate();
+            value.load();
         }
     }
 

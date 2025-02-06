@@ -1,0 +1,44 @@
+plugins {
+    id 'java'
+}
+
+group = 'me.thedivazo.libs.dvzconfig.test'
+version = 'unspecified'
+
+repositories {
+    maven {
+        name = 'papermc'
+        url = 'https://repo.papermc.io/repository/maven-public/'
+    }
+    maven {
+        url = 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/'
+        content {
+            includeGroup 'org.bukkit'
+            includeGroup 'org.spigotmc'
+        }
+    }
+    maven { url = 'https://oss.sonatype.org/content/repositories/snapshots' }
+    maven { url = 'https://oss.sonatype.org/content/repositories/central' }
+    mavenLocal()
+    mavenCentral()
+}
+
+dependencies {
+    testImplementation project(':config-yaml')
+    testImplementation project(":core")
+    testImplementation project(':platform-paper')
+    testImplementation project(':platform-spigot')
+
+    testImplementation 'org.spigotmc:spigot-api:1.20.1-R0.1-SNAPSHOT'
+    testImplementation 'org.spongepowered:configurate-core:4.1.1'
+    testImplementation 'org.mockito:mockito-core:5.0.0'
+    testImplementation platform('org.junit:junit-bom:5.10.0')
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
+    testCompileOnly 'org.projectlombok:lombok:1.18.36'
+    testAnnotationProcessor 'org.projectlombok:lombok:1.18.36'
+}
+
+test {
+    useJUnitPlatform()
+}

@@ -15,4 +15,5 @@ include 'core'
 include 'config-yaml'
 include 'platform-spigot'
 include 'platform-paper'
+include 'test'
 

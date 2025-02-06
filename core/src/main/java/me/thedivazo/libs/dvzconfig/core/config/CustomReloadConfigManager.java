@@ -17,6 +17,11 @@ public class CustomReloadConfigManager implements ConfigManager {
     }
 
     @Override
+    public ConfigContainer getConfigContainer() {
+        return container;
+    }
+
+    @Override
     public void load() {
         container.loadAll();
     }
@@ -24,7 +29,7 @@ public class CustomReloadConfigManager implements ConfigManager {
     @Override
     public void reload() {
         for (Map.Entry<Class<?>, ConfigWrapper<?>> entry : container.getContainer().entrySet()) {
-            Consumer<? super ConfigWrapper<?>> consumer = reloadFunctions.getOrDefault(entry.getKey(), ConfigWrapper::reload);
+            Consumer<? super ConfigWrapper<?>> consumer = reloadFunctions.getOrDefault(entry.getKey(), ConfigWrapper::load);
             consumer.accept(entry.getValue());
         }
     }

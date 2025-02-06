@@ -1,4 +1,4 @@
-package me.thedivazo.libs.dvzconfig.core.serializer.config;
+package me.thedivazo.libs.dvzconfig.object;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,7 +9,6 @@ import org.spongepowered.configurate.objectmapping.ConfigSerializable;
  * @author TheDiVaZo
  * created on 05.02.2025
  */
-@ConfigSerializable
 @NoArgsConstructor
 @Getter
 @Setter

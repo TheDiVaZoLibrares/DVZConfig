@@ -21,14 +21,14 @@ public class YamlConfigLoader<T> extends ConfigLoader<T> {
         return new YamlConfigLoader<>(serializerCollections, 4, NodeStyle.BLOCK);
     }
 
-    protected YamlConfigLoader(TypeSerializerCollection[] serializerCollections, int indent, NodeStyle nodeStyle) {
+    public YamlConfigLoader(TypeSerializerCollection[] serializerCollections, int indent, NodeStyle nodeStyle) {
         super(serializerCollections);
         this.indent = indent;
         this.nodeStyle = nodeStyle;
     }
 
     @Override
-    protected ConfigurationLoader<CommentedConfigurationNode> getLoader(Path pathToFile) {
+    public ConfigurationLoader<CommentedConfigurationNode> getLoader(Path pathToFile) {
         return YamlConfigurationLoader.builder()
                 .defaultOptions(opts -> opts
                         .shouldCopyDefaults(true)

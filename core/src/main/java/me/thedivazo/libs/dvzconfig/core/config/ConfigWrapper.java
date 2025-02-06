@@ -14,39 +14,28 @@ public final class ConfigWrapper<T> {
     private ConfigLoader<T> configLoader;
     private Path pathToFile;
     private T actualConfig;
+    private final T defaultConfig;
     private Class<? extends T> configClass;
 
-    public ConfigWrapper(@Nullable Path pathToFile,@Nullable ConfigLoader<T> configLoader, Class<? extends T> configClass) {
-        if (!ReflectionUtil.hasAnnotation(configClass, ConfigSerializable.class)) {
+    public ConfigWrapper(@Nullable Path pathToFile,@Nullable ConfigLoader<T> configLoader, T defaultConfig) {
+        if (!ReflectionUtil.hasAnnotation(defaultConfig.getClass(), ConfigSerializable.class)) {
             throw new IllegalArgumentException("Config class has not have @ConfigSerializable annotation");
         }
-        else if (!ReflectionUtil.hasEmptyConstructor(configClass)) {
+        else if (!ReflectionUtil.hasEmptyConstructor(defaultConfig.getClass())) {
             throw new IllegalArgumentException("Config class has not have empty constructor");
         }
         this.pathToFile = pathToFile;
         this.configLoader = configLoader;
-        this.configClass = configClass;
+        this.configClass = (Class<? extends T>) defaultConfig.getClass();
+        this.defaultConfig = defaultConfig;
     }
 
     public void updatePath(Path newPath) {
         this.pathToFile = newPath;
     }
 
-    public void load(boolean save) {
-        actualConfig = configLoader.load(pathToFile, configClass, save);
-    }
-
-    public void loadOrCreate() {
-        boolean isExist = pathToFile.toFile().exists();
-        load(!isExist);
-    }
-
-    public void loadAndSave() {
-        load(true);
-    }
-
-    public void reload() {
-        load(false);
+    public void load() {
+        actualConfig = configLoader.load(pathToFile, defaultConfig);
     }
 
     public void save() {
@@ -55,6 +44,10 @@ public final class ConfigWrapper<T> {
 
     public T getConfig() {
         return actualConfig;
+    }
+
+    public Class<? extends T> getConfigClass() {
+        return configClass;
     }
 
     @Override
@@ -71,4 +64,6 @@ public final class ConfigWrapper<T> {
         result = 31 * result + configClass.hashCode();
         return result;
     }
+
+
 }

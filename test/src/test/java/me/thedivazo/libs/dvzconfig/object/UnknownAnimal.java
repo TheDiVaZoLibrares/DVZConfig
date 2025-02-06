@@ -1,8 +1,9 @@
-package me.thedivazo.libs.dvzconfig.core.serializer.config;
+package me.thedivazo.libs.dvzconfig.object;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.spongepowered.configurate.objectmapping.ConfigSerializable;
 
 import java.util.Set;
 

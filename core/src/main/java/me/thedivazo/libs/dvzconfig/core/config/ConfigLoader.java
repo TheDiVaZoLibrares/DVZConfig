@@ -18,15 +18,15 @@ public abstract class ConfigLoader<T> {
         this.serializerCollections = serializerCollections;
     }
 
-    public T load(Path pathToFile, Class<? extends T> clazz, boolean save) {
+    public T load(Path pathToFile, T defaultValue) {
         try {
             ConfigurationLoader<CommentedConfigurationNode> loader = getLoader(pathToFile);
             CommentedConfigurationNode node = loader.load();
-            T config = node.get(clazz);
-            if (save) {
-                node.set(clazz, config);
+            if (node.isNull()) {
+                node.set(defaultValue.getClass(), defaultValue);
                 loader.save(node);
             }
+            T config = (T) node.get(defaultValue.getClass());
             return config;
         } catch (ConfigurateException e) {
             throw new RuntimeException(e);
@@ -44,5 +44,5 @@ public abstract class ConfigLoader<T> {
         }
     }
 
-    protected abstract ConfigurationLoader<CommentedConfigurationNode> getLoader(Path pathToFile);
+    public abstract ConfigurationLoader<CommentedConfigurationNode> getLoader(Path pathToFile);
 }

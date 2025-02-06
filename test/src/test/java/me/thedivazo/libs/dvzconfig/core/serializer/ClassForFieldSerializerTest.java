@@ -1,8 +1,6 @@
 package me.thedivazo.libs.dvzconfig.core.serializer;
 
-import com.google.common.collect.BiMap;
-import com.google.common.collect.HashBiMap;
-import me.thedivazo.libs.dvzconfig.core.serializer.config.*;
+import me.thedivazo.libs.dvzconfig.object.*;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.spongepowered.configurate.ConfigurationNode;

@@ -12,6 +12,11 @@ public class ConfigManagerImpl implements ConfigManager {
     }
 
     @Override
+    public ConfigContainer getConfigContainer() {
+        return container;
+    }
+
+    @Override
     public void load() {
         container.loadAll();
     }
@@ -19,7 +24,7 @@ public class ConfigManagerImpl implements ConfigManager {
     @Override
     public void reload() {
         for (ConfigWrapper<?> value : container.getContainer().values()) {
-            value.reload();
+            value.load();
         }
     }
 }
