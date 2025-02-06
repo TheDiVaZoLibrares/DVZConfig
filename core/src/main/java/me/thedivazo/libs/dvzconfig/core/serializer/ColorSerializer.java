@@ -20,16 +20,16 @@ import java.util.function.Predicate;
  * Либо в текстовом формате названия цвета -> red, green, blue
  */
 public abstract class ColorSerializer<C> extends ScalarSerializer<C> {
-    protected final Map<String, Integer> colorNamesToRgbaModel;
+    protected final Map<String, Integer> colorNamesToArgbMap;
 
-    protected ColorSerializer(TypeToken<C> type, Map<String, Integer> colorNamesToRgbaModel) {
+    protected ColorSerializer(TypeToken<C> type, Map<String, Integer> colorNamesToArgbMap) {
         super(type);
-        this.colorNamesToRgbaModel = Map.copyOf(colorNamesToRgbaModel);
+        this.colorNamesToArgbMap = Map.copyOf(colorNamesToArgbMap);
     }
 
-    protected OptionalInt optionalDecode(String str) {
+    protected OptionalInt deserialize(String argb) {
         try {
-            return OptionalInt.of(Integer.decode(str));
+            return OptionalInt.of(Integer.decode(argb));
         } catch (NumberFormatException ignored) {
             return OptionalInt.empty();
         }
@@ -38,10 +38,10 @@ public abstract class ColorSerializer<C> extends ScalarSerializer<C> {
     protected String serialize(int argb) {
         final char HEX_CHARACTER = '#';
         final int rgbLength = 6;
-        final int rgbaLength = 8;
+        final int argbLength = 8;
 
         String hex = Integer.toHexString(argb);
-        int minLength = hex.length() <= rgbLength ? rgbLength : rgbaLength;
+        int minLength = hex.length() <= rgbLength ? rgbLength : argbLength;
 
         return HEX_CHARACTER + Strings.padEnd(Integer.toHexString(argb), minLength, '0');
     }
@@ -49,23 +49,23 @@ public abstract class ColorSerializer<C> extends ScalarSerializer<C> {
     @Override
     public C deserialize(Type type, Object obj) throws SerializationException {
         String str = obj.toString();
-        OptionalInt optionalInt = optionalDecode(str);
-        Integer rgbaOrNull = null;
+        OptionalInt optionalInt = deserialize(str);
+        Integer argbOrNull = null;
         if (optionalInt.isPresent()) {
-            rgbaOrNull = optionalInt.getAsInt();
+            argbOrNull = optionalInt.getAsInt();
         } else {
-            rgbaOrNull = colorNamesToRgbaModel.get(str);
+            argbOrNull = colorNamesToArgbMap.get(str);
         }
 
-        int rgba = Optional
-                .ofNullable(rgbaOrNull)
+        int argb = Optional
+                .ofNullable(argbOrNull)
                 .orElseThrow(() -> new SerializationException("Could not deserialize color from string: " + str));
-        return fromARGB(rgba);
+        return fromARGB(argb);
     }
     @Override
     protected Object serialize(C item, Predicate<Class<?>> typeSupported) {
-        int rgba = toARGB(item);
-        return serialize(rgba);
+        int argb = toARGB(item);
+        return serialize(argb);
     }
 
     /**

@@ -7,6 +7,8 @@ import org.spongepowered.configurate.serialize.ScalarSerializer;
 import org.spongepowered.configurate.serialize.SerializationException;
 
 import java.lang.reflect.Type;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -21,11 +23,20 @@ import static me.thedivazo.libs.dvzconfig.core.util.RegexUtil.WORLD_NAME_PATTERN
  */
 public class LocationScalarSerializer extends ScalarSerializer<Location> {
     public static final LocationScalarSerializer DEFAULT = new LocationScalarSerializer(WORLD_NAME_PATTERN, POINT_NUM_PATTERN);
+    private static final DecimalFormat DECIMAL_FORMAT;
+
+    static {
+        DecimalFormatSymbols otherSymbols = new DecimalFormatSymbols();
+        otherSymbols.setDecimalSeparator('.');
+        otherSymbols.setGroupingSeparator(',');
+
+        DECIMAL_FORMAT = new DecimalFormat("0.#######", otherSymbols);
+    }
 
     //Эта хрень должна согласовываться с LOCATION_PATTERN_STR
     private static final String WORLD_FORMAT_CHUNK = "%s:";
-    private static final String COORDINATES_FORMAT_CHUNK = "%f:%f:%f";
-    private static final String ROTATION_COORD_FORMAT_CHUNK = "|%f:%f";
+    private static final String COORDINATES_FORMAT_CHUNK = "%s:%s:%s";
+    private static final String ROTATION_COORD_FORMAT_CHUNK = "|%s:%s";
 
     //Не забыть: При изменении LOCATION_PATTERN_STR нужно так-же менять все номера групп в соответствии с номером в LOCATION_PATTERN_STR
     //Пример нумерации групп: 1()1 2(3()3 4(5()5 6()6)4)2 7()7 8()8 - цифры - обозначение номера группы
@@ -61,26 +72,31 @@ public class LocationScalarSerializer extends ScalarSerializer<Location> {
         String strValue = obj.toString();
         Matcher matcher = locationPattern.matcher(strValue);
         if (!matcher.find()) {
-            throw new SerializationException("Invalid location string: " + strValue + ", regEx format: " + locationPattern);
+            throw new SerializationException("Invalid location string: \"" + strValue + "\", regEx format: \"" + locationPattern +"\"");
         }
         String worldName = matcher.group(NUMBER_GROUP_WORLD_NAME);
-        double x = Double.parseDouble(matcher.group(NUMBER_GROUP_X + worldNameGroupShift));
-        double y = Double.parseDouble(matcher.group(NUMBER_GROUP_Y + worldNameGroupShift + coordinateGroupShift));
-        double z = Double.parseDouble(matcher.group(NUMBER_GROUP_Z + worldNameGroupShift + coordinateGroupShift*2));
-        String strYaw = matcher.group(NUMBER_GROUP_YAW + worldNameGroupShift + coordinateGroupShift*3);
-        String strPitch = matcher.group(NUMBER_GROUP_PITCH + worldNameGroupShift + coordinateGroupShift*4);
 
-        float yaw = 0;
-        float pitch = 0;
+        try {
+            double x = Double.parseDouble(matcher.group(NUMBER_GROUP_X + worldNameGroupShift));
+            double y = Double.parseDouble(matcher.group(NUMBER_GROUP_Y + worldNameGroupShift + coordinateGroupShift));
+            double z = Double.parseDouble(matcher.group(NUMBER_GROUP_Z + worldNameGroupShift + coordinateGroupShift * 2));
+            String strYaw = matcher.group(NUMBER_GROUP_YAW + worldNameGroupShift + coordinateGroupShift * 3);
+            String strPitch = matcher.group(NUMBER_GROUP_PITCH + worldNameGroupShift + coordinateGroupShift * 4);
 
-        if (strYaw != null && !strYaw.isEmpty()) {
-            yaw = Float.parseFloat(strYaw);
+            float yaw = 0;
+            float pitch = 0;
+
+            if (strYaw != null && !strYaw.isEmpty()) {
+                yaw = Float.parseFloat(strYaw);
+            }
+            if (strPitch != null && !strPitch.isEmpty()) {
+                pitch = Float.parseFloat(strPitch);
+            }
+
+            return new Location(Bukkit.getWorld(worldName), x, y, z, yaw, pitch);
+        } catch (NumberFormatException exception) {
+            throw new SerializationException(exception);
         }
-        if (strPitch != null && !strPitch.isEmpty()) {
-            pitch = Float.parseFloat(strPitch);
-        }
-
-        return new Location(Bukkit.getWorld(worldName), x, y, z, yaw, pitch);
     }
 
     @Override
@@ -90,10 +106,13 @@ public class LocationScalarSerializer extends ScalarSerializer<Location> {
             stringBuilder.append(String.format(WORLD_FORMAT_CHUNK, item.getWorld().getName()));
         }
 
-        stringBuilder.append(String.format(COORDINATES_FORMAT_CHUNK, item.getX(), item.getY(), item.getZ()));
+        stringBuilder.append(String.format(COORDINATES_FORMAT_CHUNK,
+                DECIMAL_FORMAT.format(item.getX()),
+                DECIMAL_FORMAT.format(item.getY()),
+                DECIMAL_FORMAT.format(item.getZ())));
 
         if (item.getYaw()!= 0 || item.getPitch()!= 0) {
-            stringBuilder.append(String.format(ROTATION_COORD_FORMAT_CHUNK, item.getYaw(), item.getPitch()));
+            stringBuilder.append(String.format(ROTATION_COORD_FORMAT_CHUNK, DECIMAL_FORMAT.format(item.getYaw()), DECIMAL_FORMAT.format(item.getPitch())));
         }
 
         return stringBuilder.toString();

@@ -1,5 +1,6 @@
 package me.thedivazo.libs.dvzconfig.core.serializer;
 
+import com.google.common.collect.*;
 import org.spongepowered.configurate.ConfigurationNode;
 import org.spongepowered.configurate.objectmapping.ObjectMapper;
 import org.spongepowered.configurate.serialize.SerializationException;
@@ -7,23 +8,20 @@ import org.spongepowered.configurate.serialize.TypeSerializer;
 
 import java.lang.reflect.Type;
 import java.util.Map;
-import java.util.function.Function;
 
 /**
  * @author TheDiVaZo
  * created on 31.01.2025
  */
-public class ClassForFieldSerializer<K, T> implements TypeSerializer<T> {
+public final class ClassForFieldSerializer<K, T> implements TypeSerializer<T> {
     private final Object[] fieldIdPath;
     private final Class<K> fieldIdValueClass;
-    private final Function<T, K> fieldIdValueExtractor;
-    private final Map<K, Class<? extends T>> fieldValueToClass;
+    private final BiMap<K, Class<? extends T>> typeClassMap;
 
-    public ClassForFieldSerializer(Object[] fieldIdPath, Class<K> fieldIdValueClass, Function<T, K> fieldIdValueExtractor, Map<K, Class<? extends T>> fieldValueToClass) {
+    public ClassForFieldSerializer(Object[] fieldIdPath, Class<K> fieldIdValueClass, Map<K, Class<? extends T>> typeClassMap) {
         this.fieldIdPath = fieldIdPath;
         this.fieldIdValueClass = fieldIdValueClass;
-        this.fieldIdValueExtractor = fieldIdValueExtractor;
-        this.fieldValueToClass = Map.copyOf(fieldValueToClass);
+        this.typeClassMap = ImmutableBiMap.copyOf(typeClassMap);
     }
 
     @Override
@@ -32,7 +30,7 @@ public class ClassForFieldSerializer<K, T> implements TypeSerializer<T> {
         if (fieldIdValue == null) {
             throw new SerializationException("Could not deserialize object, because exist field id");
         }
-        Class<? extends T> clazz = fieldValueToClass.get(fieldIdValue);
+        Class<? extends T> clazz = typeClassMap.get(fieldIdValue);
         if (clazz == null) {
             throw new SerializationException("Could not deserialize object, because class for field id not found");
         }
@@ -45,13 +43,11 @@ public class ClassForFieldSerializer<K, T> implements TypeSerializer<T> {
         if (obj == null) {
             throw new SerializationException("Could not serialize object, because object is null");
         }
-        Class<? extends T> clazz = fieldValueToClass.get(fieldIdValueExtractor.apply(obj));
-        if (clazz == null) {
-            throw new SerializationException("Could not deserialize object, because class for field id not found");
+        K idValue = typeClassMap.inverse().get(obj.getClass());
+        if (idValue == null) {
+            throw new SerializationException("Could not serialize object, because id field is null");
         }
-        if (!clazz.isInstance(obj)) {
-            throw new SerializationException("Could not serialize object, because object is not instance of expected class");
-        }
-        ((ObjectMapper<T>) ObjectMapper.factory().get(clazz)).save(obj, node);
+        node.node(fieldIdPath).set(idValue);
+        ((ObjectMapper<T>) ObjectMapper.factory().get(obj.getClass())).save(obj, node);
     }
 }
