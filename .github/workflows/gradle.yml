@@ -1,0 +1,37 @@
+name: Build
+on:
+  push:
+    branches:
+      - main
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4 # https://github.com/actions/checkout/releases
+        with:
+          fetch-depth: 0 # Shallow clones should be disabled for a better relevancy of analysis
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4 # https://github.com/actions/setup-java/releases
+        with:
+          distribution: 'temurin'
+          java-version: 21
+      - name: Cache Gradle
+        uses: actions/cache@v4.2.0 # https://github.com/actions/cache/releases
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+      - name: Build and analyze
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Needed to get PR information, if any
+        run: ./gradlew clean build
+      - name: Rename JARs with Build Number
+        run: |
+          find target -type f -name "DVZConfig-*.jar" | while read -r jar; do
+            new_name=$(echo "$jar" | sed "s/DVZConfig-\(.*\)\.jar/DVZConfig-\1+${{ github.run_number }}.jar/")
+            mv "$jar" "$new_name"
+          done
