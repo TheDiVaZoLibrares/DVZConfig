@@ -34,7 +34,7 @@ import java.util.Set;
 import static org.junit.jupiter.api.Assertions.*;
 
 class ClassForFieldSerializerTest {
-    private static ClassForFieldSerializer<String, Animal> animalNameSerializer;
+    private static ClassForFieldSerializer<Animal, String> animalNameSerializer;
 
     @BeforeAll
     static void setUp() {
@@ -42,9 +42,9 @@ class ClassForFieldSerializerTest {
                 new Object[]{"type"},
                 String.class,
                 Map.of(
-                        "bug", Bug.class,
-                        "cat", Cat.class,
-                        "cow", Cow.class
+                        Bug.class, "bug",
+                        Cat.class, "cat",
+                        Cow.class, "cow"
                 )
         );
     }

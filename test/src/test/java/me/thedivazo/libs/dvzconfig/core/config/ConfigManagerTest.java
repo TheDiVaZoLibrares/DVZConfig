@@ -47,7 +47,7 @@ class ConfigManagerTest {
 
     private static YamlConfigLoader<TestConfigOne> yamlConfigLoader;
     private static ConfigurationLoader<CommentedConfigurationNode> configurationLoader;
-    private static ClassForFieldSerializer<String, Animal> animalNameSerializer;
+    private static ClassForFieldSerializer<Animal, String> animalNameSerializer;
     private static ConfigContainer container;
     private static Path path;
 
@@ -61,10 +61,10 @@ class ConfigManagerTest {
                 new Object[]{"type"},
                 String.class,
                 Map.of(
-                        "animal", Animal.class,
-                        "bug", Bug.class,
-                        "cat", Cat.class,
-                        "cow", Cow.class
+                        Animal.class, "animal",
+                        Bug.class, "bug",
+                        Cat.class, "cat",
+                        Cow.class, "cow"
                 )
         );
 

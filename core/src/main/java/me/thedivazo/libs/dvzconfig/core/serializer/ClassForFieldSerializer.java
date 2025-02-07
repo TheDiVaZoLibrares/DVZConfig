@@ -86,10 +86,10 @@ import java.util.Optional;
  * а значением – соответствующий класс:</p>
  *
  * <pre>{@code
- * Map<String, Class<? extends Param>> typeMap = Map.of(
- *     "paramA", ParamA.class,
- *     "paramB", ParamB.class,
- *     "paramAC", ParamAC.class
+ * Map<Class<? extends Param>, String> typeMap = Map.of(
+ *     ParamA.class, "paramA"
+ *     ParamB.class, "paramB",
+ *     ParamAC.class, "paramAC"
  * );
  *
  * // Указываем, что поле "type" в конфигурационном узле содержит идентификатор типа
@@ -130,8 +130,8 @@ import java.util.Optional;
  *   param2: 35
  * }</pre>
  *
- * @param <K> тип идентификатора (например, {@code String})
  * @param <T> базовый тип объектов, которые могут быть (де)сериализованы данным сериализатором
+ * @param <K> тип идентификатора (например, {@code String}). Рекомендуется использовать Immutable тип.
  *
  * @see TypeSerializer
  * @see ObjectMapper
@@ -139,13 +139,13 @@ import java.util.Optional;
  * @author TheDiVaZo
  * @since 31.01.2025
  */
-public final class ClassForFieldSerializer<K, T> implements TypeSerializer<T> {
+public final class ClassForFieldSerializer<T, K> implements TypeSerializer<T> {
 
-    private final Ordering<Map.Entry<K, Class<? extends T>>> mapOrdering = new Ordering<>() {
+    private final Ordering<Map.Entry<Class<? extends T>, K>> mapOrdering = new Ordering<>() {
         @Override
-        public int compare(Map.Entry<K, Class<? extends T>> left, Map.Entry<K, Class<? extends T>> right) {
-            Class<? extends T> leftClass = left.getValue();
-            Class<? extends T> rightClass = right.getValue();
+        public int compare(Map.Entry<Class<? extends T>, K> left, Map.Entry<Class<? extends T>, K> right) {
+            Class<? extends T> leftClass = left.getKey();
+            Class<? extends T> rightClass = right.getKey();
             if (leftClass.isAssignableFrom(rightClass)) {
                 return 1; // leftClass является родительским классом rightClass – помещаем его ниже
             } else if (rightClass.isAssignableFrom(leftClass)) {
@@ -157,7 +157,7 @@ public final class ClassForFieldSerializer<K, T> implements TypeSerializer<T> {
 
     private final Object[] fieldIdPath;
     private final Class<K> fieldIdValueClass;
-    private final BiMap<K, Class<? extends T>> typeClassMap;
+    private final BiMap<Class<? extends T>, K> typeClassMap;
 
     /**
      * Конструктор, инициализирующий сериализатор с указанными параметрами.
@@ -166,11 +166,11 @@ public final class ClassForFieldSerializer<K, T> implements TypeSerializer<T> {
      * @param fieldIdValueClass класс значения идентификатора (например, {@code String.class})
      * @param typeClassMap     карта сопоставления идентификаторов и классов, подлежащих (де)сериализации
      */
-    public ClassForFieldSerializer(Object[] fieldIdPath, Class<K> fieldIdValueClass, Map<K, Class<? extends T>> typeClassMap) {
+    public ClassForFieldSerializer(Object[] fieldIdPath, Class<K> fieldIdValueClass, Map<Class<? extends T>, K> typeClassMap) {
         this.fieldIdPath = fieldIdPath;
         this.fieldIdValueClass = fieldIdValueClass;
-        ImmutableBiMap.Builder<K, Class<? extends T>> builder = ImmutableBiMap.builder();
-        for (Map.Entry<K, Class<? extends T>> entry : mapOrdering.sortedCopy(typeClassMap.entrySet())) {
+        ImmutableBiMap.Builder<Class<? extends T>, K> builder = ImmutableBiMap.builder();
+        for (Map.Entry<Class<? extends T>, K> entry : mapOrdering.sortedCopy(typeClassMap.entrySet())) {
             builder.put(entry.getKey(), entry.getValue());
         }
         this.typeClassMap = builder.build();
@@ -199,7 +199,7 @@ public final class ClassForFieldSerializer<K, T> implements TypeSerializer<T> {
         if (fieldIdValue == null) {
             throw new SerializationException("Could not deserialize object, because exist field id");
         }
-        Class<? extends T> clazz = typeClassMap.get(fieldIdValue);
+        Class<? extends T> clazz = typeClassMap.inverse().get(fieldIdValue);
         if (clazz == null) {
             throw new SerializationException("Could not deserialize object, because class for field id not found");
         }
@@ -228,7 +228,7 @@ public final class ClassForFieldSerializer<K, T> implements TypeSerializer<T> {
         if (obj == null) {
             throw new SerializationException("Could not serialize object, because object is null");
         }
-        Optional<K> idValueOpt = typeClassMap.entrySet().stream().filter(entry -> entry.getValue().isInstance(obj)).map(Map.Entry::getKey).findFirst();
+        Optional<K> idValueOpt = typeClassMap.entrySet().stream().filter(entry -> entry.getKey().isInstance(obj)).map(Map.Entry::getValue).findFirst();
         if (idValueOpt.isEmpty()) {
             throw new SerializationException("Could not serialize object, because id field is null");
         }
