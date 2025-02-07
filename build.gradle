@@ -7,7 +7,31 @@ plugins {
 }
 
 group = 'me.thedivazo.libs'
-version = '1.0.0'
+
+version = '1.0.0-SNAPSHOT'
+
+def passwordProperty = new Properties()
+def passwordPropertyFile = rootProject.file('.gradle/gradle.properties')
+if (passwordPropertyFile.exists()) {
+    passwordPropertyFile.withReader('UTF-8') { reader -> passwordProperty.load(reader) }
+}
+
+publishing {
+    repositories {
+        maven {
+            url("$myMavenRepoWriteUrl")
+
+            credentials {
+                username myMavenRepoWriteUsername
+                password myMavenRepoWritePassword
+            }
+
+            authentication {
+                basic(BasicAuthentication)
+            }
+        }
+    }
+}
 
 allprojects {
     apply plugin: 'java'
@@ -57,8 +81,8 @@ subprojects {
                 "-Astubs=${rootDir}"
         ]
         checkers = [
-            'org.checkerframework.checker.nullness.NullnessChecker',
-            'org.checkerframework.checker.index.IndexChecker'
+                'org.checkerframework.checker.nullness.NullnessChecker',
+                'org.checkerframework.checker.index.IndexChecker'
         ]
     }
 
@@ -86,4 +110,64 @@ subprojects {
     shadowJar.dependsOn(sourcesJar/*, javadocJar*/)
 
     jar.dependsOn(shadowJar)
+
+    if (['core'].contains(project.name)) {
+        publishing {
+            publications {
+                mavenCore(MavenPublication) {
+                    groupId = 'me.thedivazo.libs.DVZConfig'
+                    artifactId = project.name
+                    version = "$rootProject.version"
+                    artifact shadowJar
+                    artifact sourcesJar
+                    artifact javadocJar
+                }
+            }
+        }
+    }
+
+    if (['lang-yml'].contains(project.name)) {
+        publishing {
+            publications {
+                mavenLangYml(MavenPublication) {
+                    groupId = 'me.thedivazo.libs.DVZConfig'
+                    artifactId = project.name
+                    version = "$rootProject.version"
+                    artifact shadowJar
+                    artifact sourcesJar
+                    artifact javadocJar
+                }
+            }
+        }
+    }
+
+    if (['platform-paper'].contains(project.name)) {
+        publishing {
+            publications {
+                mavenPlatformPaper(MavenPublication) {
+                    groupId = 'me.thedivazo.libs.DVZConfig'
+                    artifactId = project.name
+                    version = "$rootProject.version"
+                    artifact shadowJar
+                    artifact sourcesJar
+                    artifact javadocJar
+                }
+            }
+        }
+    }
+
+    if (['platform-spigot'].contains(project.name)) {
+        publishing {
+            publications {
+                mavenPlatformSpigot(MavenPublication) {
+                    groupId = 'me.thedivazo.libs.DVZConfig'
+                    artifactId = project.name
+                    version = "$rootProject.version"
+                    artifact shadowJar
+                    artifact sourcesJar
+                    artifact javadocJar
+                }
+            }
+        }
+    }
 }
