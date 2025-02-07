@@ -1,0 +1,7 @@
+import org.checkerframework.checker.index.qual.NonNegative;
+
+package java.util.stream;
+
+interface IntStream {
+  @NonNegative long count();
+}

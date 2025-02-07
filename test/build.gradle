@@ -24,7 +24,7 @@ repositories {
 }
 
 dependencies {
-    testImplementation project(':config-yaml')
+    testImplementation project(':lang-yml')
     testImplementation project(":core")
     testImplementation project(':platform-paper')
     testImplementation project(':platform-spigot')

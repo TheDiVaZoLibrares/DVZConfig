@@ -7,7 +7,7 @@ plugins {
 }
 
 group = 'me.thedivazo.libs.dvzconfig'
-version = 'unspecified'
+version = '1.0.0-SNAPSHOT'
 
 allprojects {
     apply plugin: 'java'
@@ -15,7 +15,10 @@ allprojects {
     apply plugin: 'org.cadixdev.licenser'
 
     compileJava.options.encoding = 'UTF-8'
-    //compileJava.options.compilerArgs += ['-Xlint:unchecked', '-Xlint:deprecation']
+    compileJava.options.compilerArgs += [
+//            '-Xlint:unchecked',
+//            '-Xlint:deprecation'
+    ]
     compileJava.options.release.set 21
     javadoc.options.encoding = 'UTF-8'
 
@@ -37,12 +40,12 @@ allprojects {
 }
 
 subprojects {
-    apply plugin: 'org.checkerframework'
-
     if (['test'].contains(project.name)) return;
 
+    apply plugin: 'org.checkerframework'
+
     version rootProject.version
-    archivesBaseName = "${rootProject.name}-${project.name.capitalize()}"
+    archivesBaseName = "${rootProject.name}-${project.name}"
 
     dependencies {
         checkerFramework 'org.checkerframework:checker:3.49.0'
@@ -50,6 +53,9 @@ subprojects {
     }
 
     checkerFramework {
+        extraJavacArgs = [
+                "-Astubs=${rootDir}"
+        ]
         checkers = [
             'org.checkerframework.checker.nullness.NullnessChecker',
             'org.checkerframework.checker.index.IndexChecker'

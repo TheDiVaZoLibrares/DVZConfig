@@ -12,7 +12,7 @@ plugins {
 
 rootProject.name = 'DVZConfig'
 include 'core'
-include 'config-yaml'
+include 'lang-yml'
 include 'platform-spigot'
 include 'platform-paper'
 include 'test'

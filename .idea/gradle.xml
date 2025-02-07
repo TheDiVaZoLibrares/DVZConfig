@@ -8,8 +8,8 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
-            <option value="$PROJECT_DIR$/config-yaml" />
             <option value="$PROJECT_DIR$/core" />
+            <option value="$PROJECT_DIR$/lang-yml" />
             <option value="$PROJECT_DIR$/platform-paper" />
             <option value="$PROJECT_DIR$/platform-spigot" />
             <option value="$PROJECT_DIR$/test" />

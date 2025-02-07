@@ -3,6 +3,8 @@ package me.thedivazo.libs.dvzconfig.spigot.serializer;
 import me.thedivazo.libs.dvzconfig.core.util.StringUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.World;
+import org.checkerframework.checker.index.qual.NonNegative;
 import org.spongepowered.configurate.serialize.ScalarSerializer;
 import org.spongepowered.configurate.serialize.SerializationException;
 
@@ -49,8 +51,8 @@ public class LocationScalarSerializer extends ScalarSerializer<Location> {
     private static final int NUMBER_GROUP_PITCH = 8;
 
     private final Pattern locationPattern;
-    private final int worldNameGroupShift;
-    private final int coordinateGroupShift;
+    private final @NonNegative int worldNameGroupShift;
+    private final @NonNegative int coordinateGroupShift;
 
     protected LocationScalarSerializer(String worldNamePatternStr, String coordinatePatternStr) {
         super(Location.class);
@@ -77,15 +79,28 @@ public class LocationScalarSerializer extends ScalarSerializer<Location> {
         String worldName = matcher.group(NUMBER_GROUP_WORLD_NAME);
 
         try {
-            double x = Double.parseDouble(matcher.group(NUMBER_GROUP_X + worldNameGroupShift));
-            double y = Double.parseDouble(matcher.group(NUMBER_GROUP_Y + worldNameGroupShift + coordinateGroupShift));
-            double z = Double.parseDouble(matcher.group(NUMBER_GROUP_Z + worldNameGroupShift + coordinateGroupShift * 2));
+            String matchedX = matcher.group(NUMBER_GROUP_X + worldNameGroupShift);
+            if (matchedX == null) {
+                throw new SerializationException("Missing X coordinate in location string: \"" + strValue + "\"");
+            }
+            double x = Double.parseDouble(matchedX);
+
+            String matchedY = matcher.group(NUMBER_GROUP_Y + worldNameGroupShift + coordinateGroupShift);
+            if (matchedY == null) {
+                throw new SerializationException("Missing Y coordinate in location string: \"" + strValue + "\"");
+            }
+            double y = Double.parseDouble(matchedY);
+
+            String matchedZ = matcher.group(NUMBER_GROUP_Z + worldNameGroupShift + coordinateGroupShift * 2);
+            if (matchedZ == null) {
+                throw new SerializationException("Missing Z coordinate in location string: \"" + strValue + "\"");
+            }
+            double z = Double.parseDouble(matchedZ);
+
             String strYaw = matcher.group(NUMBER_GROUP_YAW + worldNameGroupShift + coordinateGroupShift * 3);
             String strPitch = matcher.group(NUMBER_GROUP_PITCH + worldNameGroupShift + coordinateGroupShift * 4);
-
             float yaw = 0;
             float pitch = 0;
-
             if (strYaw != null && !strYaw.isEmpty()) {
                 yaw = Float.parseFloat(strYaw);
             }
@@ -93,7 +108,7 @@ public class LocationScalarSerializer extends ScalarSerializer<Location> {
                 pitch = Float.parseFloat(strPitch);
             }
 
-            return new Location(Bukkit.getWorld(worldName), x, y, z, yaw, pitch);
+            return new Location(worldName == null ? null : Bukkit.getWorld(worldName), x, y, z, yaw, pitch);
         } catch (NumberFormatException exception) {
             throw new SerializationException(exception);
         }
@@ -102,8 +117,9 @@ public class LocationScalarSerializer extends ScalarSerializer<Location> {
     @Override
     protected Object serialize(Location item, Predicate<Class<?>> typeSupported) {
         StringBuilder stringBuilder = new StringBuilder();
-        if (item.getWorld() != null) {
-            stringBuilder.append(String.format(WORLD_FORMAT_CHUNK, item.getWorld().getName()));
+        World world = item.getWorld();
+        if (world != null) {
+            stringBuilder.append(String.format(WORLD_FORMAT_CHUNK, world.getName()));
         }
 
         stringBuilder.append(String.format(COORDINATES_FORMAT_CHUNK,
