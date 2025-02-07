@@ -5,6 +5,8 @@ Bukkit servers' configuration library (Spigot and Paper inclusive) based on [Con
 
 Wiki will appear in this library in the near future.
 
+you can find examples of use of plugin in **tests**
+
 # Compiling
 Compilation requires JDK 21 and up.
 To compile the plugin, run ./gradlew build from the terminal.
