@@ -26,7 +26,6 @@ import org.spongepowered.configurate.serialize.TypeSerializerCollection;
 
 import java.nio.file.Path;
 import java.util.Arrays;
-import java.util.Objects;
 
 /**
  * @author TheDiVaZo

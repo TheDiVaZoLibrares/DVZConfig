@@ -49,7 +49,7 @@ public class BukkitColorSerializer extends ColorSerializer<Color> {
         ));
     }
 
-    protected BukkitColorSerializer(Map<String, Integer> colorNamesModel) {
+    public BukkitColorSerializer(Map<String, Integer> colorNamesModel) {
         super(TypeToken.get(Color.class), colorNamesModel);
     }
 

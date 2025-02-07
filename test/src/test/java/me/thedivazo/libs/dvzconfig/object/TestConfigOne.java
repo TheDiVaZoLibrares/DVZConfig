@@ -25,7 +25,6 @@ import lombok.Setter;
 import org.spongepowered.configurate.objectmapping.ConfigSerializable;
 
 import java.util.Map;
-import java.util.Set;
 
 /**
  * @author TheDiVaZo

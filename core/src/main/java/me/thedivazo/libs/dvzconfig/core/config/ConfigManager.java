@@ -17,7 +17,9 @@
  *  limitations under the License.
  */
 
-package me.thedivazo.libs.dvzconfig.core.config;/**
+package me.thedivazo.libs.dvzconfig.core.config;
+
+/**
 * @author TheDiVaZo
 * created on 03.02.2025
 */

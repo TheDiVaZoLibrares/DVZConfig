@@ -73,7 +73,7 @@ public class LocationScalarSerializer extends ScalarSerializer<Location> {
     private final @NonNegative int worldNameGroupShift;
     private final @NonNegative int coordinateGroupShift;
 
-    protected LocationScalarSerializer(String worldNamePatternStr, String coordinatePatternStr) {
+    public LocationScalarSerializer(String worldNamePatternStr, String coordinatePatternStr) {
         super(Location.class);
 
         try {

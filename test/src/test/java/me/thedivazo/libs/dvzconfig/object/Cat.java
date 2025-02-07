@@ -22,7 +22,6 @@ package me.thedivazo.libs.dvzconfig.object;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.spongepowered.configurate.objectmapping.ConfigSerializable;
 
 /**
  * @author TheDiVaZo

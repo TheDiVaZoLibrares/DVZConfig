@@ -30,11 +30,11 @@ import java.nio.file.Path;
  * created on 31.01.2025
  */
 public final class ConfigWrapper<T> {
-    private ConfigLoader<T> configLoader;
+    private final ConfigLoader<T> configLoader;
     private Path pathToFile;
     private T actualConfig;
     private final T defaultConfig;
-    private Class<? extends T> configClass;
+    private final Class<? extends T> configClass;
 
     public ConfigWrapper(Path pathToFile, ConfigLoader<T> configLoader, T defaultConfig) {
         if (defaultConfig == null || !ReflectionUtil.hasAnnotation(defaultConfig.getClass(), ConfigSerializable.class)) {

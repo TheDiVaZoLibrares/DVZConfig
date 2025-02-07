@@ -24,9 +24,24 @@ import io.leangen.geantyref.TypeToken;
 import java.awt.*;
 import java.util.Map;
 
-//TODO: Сделать реализацию по умлочанию
 public class AwtColorSerializer extends ColorSerializer<Color>{
-    protected AwtColorSerializer(Map<String, Integer> colorNamesModel) {
+    public static final AwtColorSerializer DEFAULT = new AwtColorSerializer(Map.ofEntries(
+            Map.entry("black", Color.BLACK.getRGB()),
+            Map.entry("white", Color.WHITE.getRGB()),
+            Map.entry("red", Color.RED.getRGB()),
+            Map.entry("green", Color.GREEN.getRGB()),
+            Map.entry("blue", Color.BLUE.getRGB()),
+            Map.entry("yellow", Color.YELLOW.getRGB()),
+            Map.entry("cyan", Color.CYAN.getRGB()),
+            Map.entry("magenta", Color.MAGENTA.getRGB()),
+            Map.entry("gray", Color.GRAY.getRGB()),
+            Map.entry("lightGray", Color.LIGHT_GRAY.getRGB()),
+            Map.entry("darkGray", Color.DARK_GRAY.getRGB()),
+            Map.entry("orange", Color.ORANGE.getRGB()),
+            Map.entry("pink", Color.PINK.getRGB())
+    ));
+
+    public AwtColorSerializer(Map<String, Integer> colorNamesModel) {
         super(TypeToken.get(Color.class), colorNamesModel);
     }
 
