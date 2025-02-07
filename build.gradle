@@ -67,7 +67,9 @@ subprojects {
     }
 
     shadowJar {
-        destinationDirectory.set(file("$rootDir/target"))
+        File target = file("$rootDir/target")
+        target.deleteDir()
+        destinationDirectory.set(target)
         archiveClassifier.set('')
     }
 }
