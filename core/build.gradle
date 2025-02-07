@@ -3,6 +3,6 @@ plugins {
 }
 
 dependencies {
-    api 'com.google.guava:guava:33.4.0-jre'
+    compileOnlyApi 'com.google.guava:guava:33.4.0-jre'
     api 'org.spongepowered:configurate-core:4.1.1'
 }

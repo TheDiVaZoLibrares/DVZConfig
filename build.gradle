@@ -7,7 +7,6 @@ plugins {
 }
 
 group = 'me.thedivazo.libs'
-
 version = '1.0.0-SNAPSHOT'
 
 def passwordProperty = new Properties()
