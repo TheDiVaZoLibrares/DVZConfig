@@ -35,3 +35,9 @@ jobs:
             new_name=$(echo "$jar" | sed "s/DVZConfig-\(.*\)\.jar/DVZConfig-\1+${{ github.run_number }}.jar/")
             mv "$jar" "$new_name"
           done
+
+      - name: Upload a Build Artifacts
+        uses: actions/upload-artifact@v4.3.3 # https://github.com/actions/upload-artifact/releases
+        with:
+          name: DVZConfig
+          path: target/DVZConfig-**.jar
