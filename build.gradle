@@ -25,11 +25,11 @@ allprojects {
     repositories {
         mavenLocal()
         mavenCentral()
-        maven { url 'https://jitpack.io' }
-        maven { url 'https://repo.papermc.io/repository/maven-public/' }
-        maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
-        maven { url 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/' }
-        maven { url "https://repo.dmulloy2.net/repository/public/" }
+        maven { url('https://jitpack.io') }
+        maven { url('https://repo.papermc.io/repository/maven-public/') }
+        maven { url('https://oss.sonatype.org/content/repositories/snapshots') }
+        maven { url('https://hub.spigotmc.org/nexus/content/repositories/snapshots/') }
+        maven { url('https://repo.dmulloy2.net/repository/public/') }
     }
 
     license {
@@ -72,4 +72,18 @@ subprojects {
         destinationDirectory.set(target)
         archiveClassifier.set('')
     }
+
+    java {
+        withSourcesJar()
+        //withJavadocJar()
+    }
+    sourcesJar {
+        destinationDirectory.set(file("$rootDir/target"))
+    }
+//    javadocJar {
+//        destinationDirectory.set(file("$rootDir/target"))
+//    }
+    shadowJar.dependsOn(sourcesJar/*, javadocJar*/)
+
+    jar.dependsOn(shadowJar)
 }
