@@ -28,16 +28,34 @@ import java.nio.file.Path;
 import java.util.Arrays;
 
 /**
+ * Класс, отвечающий за загрузку и сохранение конфига
+ *
+ * @param <T> Класс конфигурации для сериализации из объекта и десериализации из файла
  * @author TheDiVaZo
- * created on 31.01.2025
+ * @since 31.01.2025
  */
 public abstract class ConfigLoader<T> {
     protected final TypeSerializerCollection[] serializerCollections;
 
+    /**
+     * @param serializerCollections список дополнительный сериализаторов.
+     */
     protected ConfigLoader(TypeSerializerCollection[] serializerCollections) {
         this.serializerCollections = Arrays.copyOf(serializerCollections, serializerCollections.length);
     }
 
+    /**
+     * Загружает конфигурацию из файла и десириализует ее.
+     * Если файла нет, создает файл со значениями по умолчанию, сохраняет на диске,
+     * после чего загружает создавшиеся файл, дессериализует и возвращает.
+     *
+     * Метод при отсутствии файла не возвращает переданное значение по умолчанию по двум причинам:
+     * 1. Иммутабельность. Если мы читаем значения из файла заного и десериализуем его, это гарантирует неизменяемость и независимость возвращаемого значения от значения по умолчанию
+     * 2. Результат должен отражать конфигурацию в файле.
+     * @param pathToFile путь до файла
+     * @param defaultValue значение по умолчанию, если файла нет.
+     * @return десериализованный объект класса конфига из файла
+     */
     public T load(Path pathToFile, T defaultValue) {
         if (defaultValue == null) {
             throw new IllegalArgumentException("default config is null");

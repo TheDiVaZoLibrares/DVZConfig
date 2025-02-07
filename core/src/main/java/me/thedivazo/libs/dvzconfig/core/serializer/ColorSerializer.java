@@ -31,12 +31,19 @@ import java.util.OptionalInt;
 import java.util.function.Predicate;
 
 /**
- * @author TheDiVaZo
- * created on 31.01.2025
+ * Абстрактный класс для сериализации и десериализации объектов, представляющих цвет.
  * <p>
- * Цвет может быть представлен в двух форматах:
- * Строка с HEX числом -> #123456, 0x123456
- * Либо в текстовом формате названия цвета -> red, green, blue
+ * По умолчанию данный сериализатор преобразует объект цвета в строку в формате {@code #rrggbb}
+ * или {@code #aarrggbb} (если значение альфа-канала ненулевое). Формат десериализации совпадает с форматом,
+ * поддерживаемым методом {@link Integer#decode(String)}.
+ * </p>
+ * <p>
+ * Кроме числового представления, данный класс поддерживает десериализацию по названию цвета. Для этого в конструктор
+ * передаётся {@code Map<String, Integer>}, сопоставляющая название цвета с его числовым значением (ARGB).
+ * </p>
+ * @param <C> Класс, представляющий цвет
+ * @author TheDiVaZo
+ * @since 31.01.2025
  */
 public abstract class ColorSerializer<C> extends ScalarSerializer<C> {
     protected final Map<String, Integer> colorNamesToArgbMap;
@@ -88,12 +95,20 @@ public abstract class ColorSerializer<C> extends ScalarSerializer<C> {
     }
 
     /**
-     * i << 24 - alpha
-     * i << 16 - red
-     * i << 8 - green
-     * i << 0 - blue
-     * @param argb
-     * @return
+     * Преобразует целочисленное значение ARGB в объект цвета.
+     * <b><b></b></b>
+     * Формат представления цвета в числе <code>argb</code> следующий:
+     * <ul>
+     *   <li><code>(argb >> 24) &amp; 0xFF</code> — альфа-канал (прозрачность)</li>
+     *   <li><code>(argb >> 16) &amp; 0xFF</code> — красный канал</li>
+     *   <li><code>(argb >> 8) &amp; 0xFF</code> — зеленый канал</li>
+     *   <li><code>(argb) &amp; 0xFF</code> — синий канал</li>
+     * </ul>
+     * При сериализации, если альфа-канал равен 0, он может быть опущен, и используется формат <code>#rrggbb</code>,
+     * в противном случае — формат <code>#aarrggbb</code>.
+     *
+     * @param argb целочисленное значение цвета в формате ARGB
+     * @return объект цвета, созданный на основе переданного значения
      */
     protected abstract C fromARGB(int argb);
     protected abstract int toARGB(C color);

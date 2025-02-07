@@ -30,7 +30,7 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 /**
  * @author TheDiVaZo
- * created on 06.02.2025
+ * @since 06.02.2025
  */
 public class ConfigWrapperTest {
 

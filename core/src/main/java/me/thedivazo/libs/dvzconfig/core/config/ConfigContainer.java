@@ -24,22 +24,40 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
+ * Класс представляет собой контейнер конфигов. По классу конфигурации можно получить его представление через {@link ConfigWrapper}, если оно существует
+ *
  * @author TheDiVaZo
- * created on 02.02.2025
+ * @since 02.02.2025
  */
 public class ConfigContainer {
     private final Map<Class<?>, ConfigWrapper<?>> container;
 
+    /**
+     * Создает контейнер конфигов из переданного множества представлений конфигураций
+     *
+     * @param configWrappers Множество представлений конфигураций
+     */
     public ConfigContainer(Set<ConfigWrapper<?>> configWrappers) {
         this.container = configWrappers.stream().collect(Collectors.toMap(ConfigWrapper::getConfigClass, configWrapper -> configWrapper));
     }
 
+    /**
+     * Загружает все конфигурации, присутствующие в контейнере (вызывает метод {@link ConfigWrapper#load()} у всех представлений в контейнере)
+     */
     public void loadAll() {
         for (ConfigWrapper<?> value : container.values()) {
             value.load();
         }
     }
 
+    /**
+     * Получает представление конфигурации по её классу конфигурации. Если класса конфигурации нет, вызывает исключение {@link IllegalArgumentException}
+     *
+     * @param clazz Класс конфигурации
+     * @param <T>  Тип конфигурации
+     * @return Представление конфигурации
+     * @throws IllegalArgumentException если представления конфигурации нет
+     */
     @SuppressWarnings("unchecked")
     public <T> ConfigWrapper<T> getConfig(Class<T> clazz) {
         Object config = container.get(clazz);

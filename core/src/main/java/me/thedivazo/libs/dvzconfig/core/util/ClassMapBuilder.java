@@ -26,7 +26,7 @@ import java.util.function.Supplier;
 
 /**
  * @author TheDiVaZo
- * created on 03.02.2025
+ * @since 03.02.2025
  *
  * Чтобы помнять назначение этого класса, рекомендуеться посмотреть его наследников
  */

@@ -20,8 +20,10 @@
 package me.thedivazo.libs.dvzconfig.core.config;
 
 /**
-* @author TheDiVaZo
-* created on 03.02.2025
+ * Интерфейс, инкапсулирующий в себе работу с конфигурацией.
+ *
+ * @author TheDiVaZo
+ * @since 03.02.2025
 */
 public interface ConfigManager {
     ConfigContainer getConfigContainer();

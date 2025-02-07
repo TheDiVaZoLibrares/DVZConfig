@@ -26,8 +26,10 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 /**
+ * Класс, представляющий собой безопасный билдер для создания карты, использующейся в {@link CustomReloadConfigManager}
+ *
  * @author TheDiVaZo
- * created on 03.02.2025
+ * @since 03.02.2025
  */
 public class CustomConfigReloadClassMapBuilder extends ClassMapBuilder<Consumer<? super ConfigWrapper<?>>> {
     public CustomConfigReloadClassMapBuilder(Supplier<Map<Class<?>, Consumer<? super ConfigWrapper<?>>>> supplier) {

@@ -21,7 +21,7 @@ package me.thedivazo.libs.dvzconfig.core.util;
 
 /**
  * @author TheDiVaZo
- * created on 05.02.2025
+ * @since 05.02.2025
  */
 public class RegexUtil {
     public static final String POINT_NUM_PATTERN = "[+-]?([0-9]*[.])?[0-9]+";

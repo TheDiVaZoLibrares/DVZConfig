@@ -28,7 +28,7 @@ import java.util.Map;
 
 /**
  * @author TheDiVaZo
- * created on 06.02.2025
+ * @since 06.02.2025
  */
 @ConfigSerializable
 @Setter

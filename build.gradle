@@ -75,14 +75,14 @@ subprojects {
 
     java {
         withSourcesJar()
-        //withJavadocJar()
+        withJavadocJar()
     }
     sourcesJar {
         destinationDirectory.set(file("$rootDir/target"))
     }
-//    javadocJar {
-//        destinationDirectory.set(file("$rootDir/target"))
-//    }
+    javadocJar {
+        destinationDirectory.set(file("$rootDir/target"))
+    }
     shadowJar.dependsOn(sourcesJar/*, javadocJar*/)
 
     jar.dependsOn(shadowJar)

@@ -32,7 +32,7 @@ import java.util.function.Predicate;
 
 /**
  * @author TheDiVaZo
- * created on 01.02.2025
+ * @since 01.02.2025
  */
 public class PotionEffectTypeSerializer extends ScalarSerializer<PotionEffectType> {
     public static final PotionEffectTypeSerializer DEFAULT = new PotionEffectTypeSerializer();

@@ -20,8 +20,10 @@
 package me.thedivazo.libs.dvzconfig.core.config;
 
 /**
+ * Реализация по умолчанию, делегирующая вызов метода загрузки и перезагрузки контейнеру {@link ConfigContainer}
+ *
  * @author TheDiVaZo
- * created on 03.02.2025
+ * @since 03.02.2025
  */
 public class ConfigManagerImpl implements ConfigManager {
     protected final ConfigContainer container;
@@ -42,8 +44,6 @@ public class ConfigManagerImpl implements ConfigManager {
 
     @Override
     public void reload() {
-        for (ConfigWrapper<?> value : container.getContainer().values()) {
-            value.load();
-        }
+        container.loadAll();
     }
 }

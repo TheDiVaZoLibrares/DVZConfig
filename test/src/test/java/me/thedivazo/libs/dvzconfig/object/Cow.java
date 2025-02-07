@@ -25,7 +25,7 @@ import lombok.Setter;
 
 /**
  * @author TheDiVaZo
- * created on 05.02.2025
+ * @since 05.02.2025
  */
 @NoArgsConstructor
 @Setter

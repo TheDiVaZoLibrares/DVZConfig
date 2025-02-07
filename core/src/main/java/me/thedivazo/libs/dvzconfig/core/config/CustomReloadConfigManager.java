@@ -23,8 +23,10 @@ import java.util.Map;
 import java.util.function.Consumer;
 
 /**
+ * Реализация, предоставляющая возможность пользовательского метода перезагрузки конфига
+ *
  * @author TheDiVaZo
- * created on 03.02.2025
+ * @since 03.02.2025
  */
 public class CustomReloadConfigManager implements ConfigManager {
     protected final ConfigContainer container;

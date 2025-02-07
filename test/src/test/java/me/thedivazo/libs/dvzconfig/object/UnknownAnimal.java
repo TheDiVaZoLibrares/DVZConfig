@@ -27,7 +27,7 @@ import java.util.Set;
 
 /**
  * @author TheDiVaZo
- * created on 06.02.2025
+ * @since 06.02.2025
  */
 @NoArgsConstructor
 @Getter

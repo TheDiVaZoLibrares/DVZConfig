@@ -26,8 +26,10 @@ import org.spongepowered.configurate.objectmapping.ConfigSerializable;
 import java.nio.file.Path;
 
 /**
+ * Класс, инкапсулирующий в себе низкоуровневую работу с конкретным конфигом
+ * Данный класс не рекомендуется к использованию в качестве ключа в Map, т.к. его параметр pathToFile, учитывающиеся в equals и hashCode, можно изменить
  * @author TheDiVaZo
- * created on 31.01.2025
+ * @since 31.01.2025
  */
 public final class ConfigWrapper<T> {
     private final ConfigLoader<T> configLoader;
@@ -50,6 +52,10 @@ public final class ConfigWrapper<T> {
         this.actualConfig = defaultConfig;
     }
 
+    /**
+     * Обновляет путь до файла конфигурации. Учьтите, что после обновления пути конфиг необходимо заново загрузить методом {@link #load()}
+     * @param newPath
+     */
     public void updatePath(Path newPath) {
         this.pathToFile = newPath;
     }

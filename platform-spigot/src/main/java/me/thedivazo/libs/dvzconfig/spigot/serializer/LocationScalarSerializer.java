@@ -40,7 +40,7 @@ import static me.thedivazo.libs.dvzconfig.core.util.RegexUtil.WORLD_NAME_PATTERN
 
 /**
  * @author TheDiVaZo
- * created on 05.02.2025
+ * @since 05.02.2025
  */
 public class LocationScalarSerializer extends ScalarSerializer<Location> {
     public static final LocationScalarSerializer DEFAULT = new LocationScalarSerializer(WORLD_NAME_PATTERN, POINT_NUM_PATTERN);

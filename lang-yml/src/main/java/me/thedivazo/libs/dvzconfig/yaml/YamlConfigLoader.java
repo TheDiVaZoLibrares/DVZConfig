@@ -30,7 +30,7 @@ import java.nio.file.Path;
 
 /**
  * @author TheDiVaZo
- * created on 31.01.2025
+ * @since 31.01.2025
  */
 public class YamlConfigLoader<T> extends ConfigLoader<T> {
     private static final YamlConfigLoader<?> DEFAULT = new YamlConfigLoader<>(NodeStyle.BLOCK, 4);
