@@ -32,24 +32,22 @@ import java.nio.file.Path;
  * @since 31.01.2025
  */
 public final class ConfigWrapper<T> {
-    private final ConfigLoader<T> configLoader;
+    private final ConfigLoader configLoader;
     private Path pathToFile;
-    private T actualConfig;
-    private final T defaultConfig;
+    private @Nullable T actualConfig;
     private final Class<? extends T> configClass;
 
-    public ConfigWrapper(Path pathToFile, ConfigLoader<T> configLoader, T defaultConfig) {
-        if (defaultConfig == null || !ReflectionUtil.hasAnnotation(defaultConfig.getClass(), ConfigSerializable.class)) {
+    public ConfigWrapper(Path pathToFile, ConfigLoader configLoader, Class<? extends T> clazz) {
+        if (!ReflectionUtil.hasAnnotation(clazz, ConfigSerializable.class)) {
             throw new IllegalArgumentException("Config class has not have @ConfigSerializable annotation");
         }
-        else if (!ReflectionUtil.hasEmptyConstructor(defaultConfig.getClass())) {
+        else if (!ReflectionUtil.hasEmptyConstructor(clazz)) {
             throw new IllegalArgumentException("Config class has not have empty constructor");
         }
         this.pathToFile = pathToFile;
         this.configLoader = configLoader;
-        this.configClass = (Class<? extends T>) defaultConfig.getClass();
-        this.defaultConfig = defaultConfig;
-        this.actualConfig = defaultConfig;
+        this.configClass = clazz;
+        this.actualConfig = null;
     }
 
     /**
@@ -61,7 +59,7 @@ public final class ConfigWrapper<T> {
     }
 
     public void load() {
-        actualConfig = configLoader.load(pathToFile, defaultConfig);
+        actualConfig = configLoader.load(pathToFile, configClass, true);
     }
 
     public void save() {

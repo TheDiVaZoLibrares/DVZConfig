@@ -30,11 +30,10 @@ import java.util.Arrays;
 /**
  * Класс, отвечающий за загрузку и сохранение конфига
  *
- * @param <T> Класс конфигурации для сериализации из объекта и десериализации из файла
  * @author TheDiVaZo
  * @since 31.01.2025
  */
-public abstract class ConfigLoader<T> {
+public abstract class ConfigLoader {
     protected final TypeSerializerCollection[] serializerCollections;
 
     /**
@@ -46,35 +45,32 @@ public abstract class ConfigLoader<T> {
 
     /**
      * Загружает конфигурацию из файла и десириализует ее.
-     * Если файла нет, создает файл со значениями по умолчанию, сохраняет на диске,
+     * Если файла нет, возвращает конфигурацию со значениями по умолчанию.
+     * В зависимости от параметра {@code save} сохраняет конфиг в файл или нет
      * после чего загружает создавшиеся файл, дессериализует и возвращает.
      *
      * Метод при отсутствии файла не возвращает переданное значение по умолчанию по двум причинам:
      * 1. Иммутабельность. Если мы читаем значения из файла заного и десериализуем его, это гарантирует неизменяемость и независимость возвращаемого значения от значения по умолчанию
      * 2. Результат должен отражать конфигурацию в файле.
      * @param pathToFile путь до файла
-     * @param defaultValue значение по умолчанию, если файла нет.
      * @return десериализованный объект класса конфига из файла
      */
-    public T load(Path pathToFile, T defaultValue) {
-        if (defaultValue == null) {
-            throw new IllegalArgumentException("default config is null");
-        }
+    public <T> T load(Path pathToFile, Class<? extends T> clazz, boolean save) {
         try {
             ConfigurationLoader<CommentedConfigurationNode> loader = getLoader(pathToFile);
             CommentedConfigurationNode node = loader.load();
-            if (node.isNull()) {
-                node.set(defaultValue.getClass(), defaultValue);
+            T config = node.get(clazz);
+            if (save) {
+                node.set(clazz, config);
                 loader.save(node);
             }
-            T config = (T) node.get(defaultValue.getClass());
             return config;
         } catch (ConfigurateException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public void save(Path pathToFile, T config) {
+    public <T> void save(Path pathToFile, T config) {
         if (config == null) {
             throw new IllegalArgumentException("default config is null");
         }
