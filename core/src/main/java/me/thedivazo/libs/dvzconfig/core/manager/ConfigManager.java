@@ -30,8 +30,23 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * @since 03.02.2025
 */
 public interface ConfigManager {
+    /**
+     * <p>В обычном коде данный метод вызываться не должен.
+     * Он нужен для принудительного изменения каких то параметров конфигурации (путь до файла, принудительная перезагрузка, сохранение и т.п.)
+     * Если вы просто хотите получить конфигурацию, вопспользуйтесь методом {@link #getConfig(Class)}
+     * </p>
+     * @param clazz класс конфигурации
+     * @return предстиавление конфигурации
+     * @param <T> класс конфигурации
+     */
     <T> @NonNull ConfigWrapper<T> getWrapper(Class<T> clazz);
 
+    /**
+     * Получить конфигурацию по классу.
+     * @param clazz класс конфигурации
+     * @param <T> класс конфигурации
+     * @return объект конфигурации
+     */
     <T> @NonNull T getConfig(Class<T> clazz);
 
     ConfigContainer getConfigContainer();

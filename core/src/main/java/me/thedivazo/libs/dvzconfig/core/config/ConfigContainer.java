@@ -86,19 +86,41 @@ public class ConfigContainer {
         return ((ConfigWrapper<T>) config).getConfigOrLoad();
     }
 
+    /**
+     * Получает конт айнер. Это безопасно, т.к. контейнер по умолчанию иммутабилен.
+     *
+     * @return мапа с классами конфигов и соответствующими представлениями
+     */
     public Map<Class<?>, ConfigWrapper<?>> getContainer() {
         return container;
     }
 
+    /**
+     * @return экземпляр билдера для инициализации контейнера конфигурации
+     */
     public static Builder builder() {
         return new Builder();
     }
 
+    /**
+     * Класс билдера для создания контейнера конфигураций
+     *
+     * Первым делом для инициализации контейнера нужно передать в него загрузчик конфигураций
+     *
+     * После чего можно будет добавить уже сами классы конфигов
+     */
     public static final class Builder {
 
+        /**
+         * Конструктор, создающий класс билдера.
+         */
         public Builder() {
         }
 
+        /**
+         * @param configLoader
+         * @return Возвращает следущий этап билдера с переданным {@link ConfigLoader}
+         */
         public ConfigWrapperBuilder loader(ConfigLoader configLoader) {
             return new ConfigWrapperBuilder(configLoader);
         }
