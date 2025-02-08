@@ -39,8 +39,7 @@ class HierarchyClassSerializerTest {
     @BeforeAll
     static void setUp() {
         animalNameSerializer = new HierarchyClassSerializer<>(
-                new Object[]{"type"},
-                String.class,
+                "type",
                 Map.of(
                         Bug.class, "bug",
                         Cat.class, "cat",
