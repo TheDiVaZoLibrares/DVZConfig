@@ -9,6 +9,7 @@ plugins {
 group = 'me.thedivazo.libs'
 version = '1.0.0'
 
+
 def passwordProperty = new Properties()
 def passwordPropertyFile = rootProject.file('.gradle/gradle.properties')
 if (passwordPropertyFile.exists()) {
