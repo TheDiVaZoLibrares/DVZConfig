@@ -33,12 +33,12 @@ import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class ClassForFieldSerializerTest {
-    private static ClassForFieldSerializer<Animal, String> animalNameSerializer;
+class HierarchyClassSerializerTest {
+    private static HierarchyClassSerializer<Animal> animalNameSerializer;
 
     @BeforeAll
     static void setUp() {
-        animalNameSerializer = new ClassForFieldSerializer<>(
+        animalNameSerializer = new HierarchyClassSerializer<>(
                 new Object[]{"type"},
                 String.class,
                 Map.of(

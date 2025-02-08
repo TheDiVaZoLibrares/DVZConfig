@@ -19,6 +19,7 @@
 
 package me.thedivazo.libs.dvzconfig.object;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -32,6 +33,7 @@ import org.spongepowered.configurate.objectmapping.ConfigSerializable;
 @NoArgsConstructor
 @Getter
 @Setter
+@EqualsAndHashCode
 public class TestConfigTwo {
     private int countAnimals = 3;
     private Animal animal = new Bug(){{

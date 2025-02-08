@@ -19,6 +19,7 @@
 
 package me.thedivazo.libs.dvzconfig.object;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -32,6 +33,7 @@ import java.util.Set;
 @NoArgsConstructor
 @Getter
 @Setter
+@EqualsAndHashCode(callSuper = true)
 public class UnknownAnimal extends Animal {
     private Set<String> unknownParam;
 }
