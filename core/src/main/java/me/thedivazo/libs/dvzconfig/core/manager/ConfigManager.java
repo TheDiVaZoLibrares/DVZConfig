@@ -17,13 +17,24 @@
  *  limitations under the License.
  */
 
-package me.thedivazo.libs.dvzconfig.core.util;
+package me.thedivazo.libs.dvzconfig.core.manager;
 
-import java.util.Map;
+import me.thedivazo.libs.dvzconfig.core.config.ConfigContainer;
+import me.thedivazo.libs.dvzconfig.core.config.ConfigWrapper;
+import org.checkerframework.checker.nullness.qual.NonNull;
+
 /**
+ * Интерфейс, инкапсулирующий в себе работу с конфигурацией.
+ *
  * @author TheDiVaZo
  * @since 03.02.2025
- */
-public interface MapBuilder<K, V> {
-    Map<K, V> builder();
+*/
+public interface ConfigManager {
+    <T> @NonNull ConfigWrapper<T> getWrapper(Class<T> clazz);
+
+    <T> @NonNull T getConfig(Class<T> clazz);
+
+    ConfigContainer getConfigContainer();
+    void load();
+    void reload();
 }

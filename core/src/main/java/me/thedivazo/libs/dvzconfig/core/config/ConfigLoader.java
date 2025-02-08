@@ -53,6 +53,7 @@ public abstract class ConfigLoader {
      * 1. Иммутабельность. Если мы читаем значения из файла заного и десериализуем его, это гарантирует неизменяемость и независимость возвращаемого значения от значения по умолчанию
      * 2. Результат должен отражать конфигурацию в файле.
      * @param pathToFile путь до файла
+     * @param save нужно ли сохранить конфиг в файле.
      * @return десериализованный объект класса конфига из файла
      */
     public <T> T load(Path pathToFile, Class<? extends T> clazz, boolean save) {
@@ -60,6 +61,9 @@ public abstract class ConfigLoader {
             ConfigurationLoader<CommentedConfigurationNode> loader = getLoader(pathToFile);
             CommentedConfigurationNode node = loader.load();
             T config = node.get(clazz);
+            if (config == null) {
+                throw new IllegalArgumentException("Invalid config deserialize or invalid path");
+            }
             if (save) {
                 node.set(clazz, config);
                 loader.save(node);

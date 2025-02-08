@@ -19,6 +19,7 @@
 
 package me.thedivazo.libs.dvzconfig.object;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -34,6 +35,7 @@ import java.util.Map;
 @Setter
 @Getter
 @NoArgsConstructor
+@EqualsAndHashCode
 public class TestConfigOne {
     private String zooName = "moscow zoo";
 

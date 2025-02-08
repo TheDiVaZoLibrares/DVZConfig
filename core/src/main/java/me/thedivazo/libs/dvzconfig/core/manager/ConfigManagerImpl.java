@@ -17,7 +17,11 @@
  *  limitations under the License.
  */
 
-package me.thedivazo.libs.dvzconfig.core.config;
+package me.thedivazo.libs.dvzconfig.core.manager;
+
+import me.thedivazo.libs.dvzconfig.core.config.ConfigContainer;
+import me.thedivazo.libs.dvzconfig.core.config.ConfigWrapper;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  * Реализация по умолчанию, делегирующая вызов метода загрузки и перезагрузки контейнеру {@link ConfigContainer}
@@ -30,6 +34,16 @@ public class ConfigManagerImpl implements ConfigManager {
 
     public ConfigManagerImpl(ConfigContainer container) {
         this.container = container;
+    }
+
+    @Override
+    public @NonNull <T> ConfigWrapper<T> getWrapper(Class<T> clazz) {
+        return container.getWrapper(clazz);
+    }
+
+    @Override
+    public @NonNull <T> T getConfig(Class<T> clazz) {
+        return container.getConfig(clazz);
     }
 
     @Override

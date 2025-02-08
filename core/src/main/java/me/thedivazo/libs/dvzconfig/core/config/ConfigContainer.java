@@ -19,6 +19,10 @@
 
 package me.thedivazo.libs.dvzconfig.core.config;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
+
+import java.nio.file.Path;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -59,15 +63,64 @@ public class ConfigContainer {
      * @throws IllegalArgumentException если представления конфигурации нет
      */
     @SuppressWarnings("unchecked")
-    public <T> ConfigWrapper<T> getConfig(Class<T> clazz) {
-        Object config = container.get(clazz);
+    public <T> @NonNull ConfigWrapper<T> getWrapper(Class<T> clazz) {
+        ConfigWrapper<?> config = container.get(clazz);
         if (config == null) {
             throw new IllegalArgumentException("No config for class: " + clazz);
         }
         return (ConfigWrapper<T>) config;
     }
 
+    /**
+     * Получает конфигурацию по её классу. Если класса конфигурации нет, вызывает исключение {@link IllegalArgumentException}
+     *
+     * @param clazz Класс конфигурации
+     * @param <T>  Класс конфигурации
+     */
+    @SuppressWarnings("unchecked")
+    public <T> @NonNull T getConfig(Class<T> clazz) {
+        ConfigWrapper<?> config = container.get(clazz);
+        if (config == null) {
+            throw new IllegalArgumentException("No config for class: " + clazz);
+        }
+        return ((ConfigWrapper<T>) config).getConfigOrLoad();
+    }
+
     public Map<Class<?>, ConfigWrapper<?>> getContainer() {
         return container;
     }
+
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    public static final class Builder {
+
+        public Builder() {
+        }
+
+        public ConfigWrapperBuilder loader(ConfigLoader configLoader) {
+            return new ConfigWrapperBuilder(configLoader);
+        }
+
+        public static final class ConfigWrapperBuilder {
+            private final ConfigLoader configLoader;
+            private Set<ConfigWrapper<?>> configWrappers;
+
+            private ConfigWrapperBuilder(ConfigLoader configLoader) {
+                this.configLoader = configLoader;
+                this.configWrappers = new HashSet<>();
+            }
+
+            public ConfigWrapperBuilder addConfig(Path pathToFile, Class<?> clazz) {
+                configWrappers.add(new ConfigWrapper<>(pathToFile, configLoader, clazz));
+                return this;
+            }
+
+            public ConfigContainer build() {
+                return new ConfigContainer(configWrappers);
+            }
+        }
+    }
+
 }

@@ -131,19 +131,16 @@ import java.util.Optional;
  * }</pre>
  *
  * @param <T> базовый тип объектов, которые могут быть (де)сериализованы данным сериализатором
- * @param <K> тип идентификатора (например, {@code String}). Рекомендуется использовать Immutable тип.
- *
+ * @author TheDiVaZo
  * @see TypeSerializer
  * @see ObjectMapper
- *
- * @author TheDiVaZo
  * @since 31.01.2025
  */
-public final class ClassForFieldSerializer<T, K> implements TypeSerializer<T> {
+public final class HierarchyClassSerializer<T> implements TypeSerializer<T> {
 
-    private final Ordering<Map.Entry<Class<? extends T>, K>> mapOrdering = new Ordering<>() {
+    private final Ordering<Map.Entry<Class<? extends T>, Object>> mapOrdering = new Ordering<>() {
         @Override
-        public int compare(Map.Entry<Class<? extends T>, K> left, Map.Entry<Class<? extends T>, K> right) {
+        public int compare(Map.Entry<Class<? extends T>, Object> left, Map.Entry<Class<? extends T>, Object> right) {
             Class<? extends T> leftClass = left.getKey();
             Class<? extends T> rightClass = right.getKey();
             if (leftClass.isAssignableFrom(rightClass)) {
@@ -156,21 +153,26 @@ public final class ClassForFieldSerializer<T, K> implements TypeSerializer<T> {
     };
 
     private final Object[] fieldIdPath;
-    private final Class<K> fieldIdValueClass;
-    private final BiMap<Class<? extends T>, K> typeClassMap;
+    private final Class<?> idFieldClass;
+    private final BiMap<Class<? extends T>, Object> typeClassMap;
+
+    public HierarchyClassSerializer(String fieldName, Map<Class<? extends T>, Object> typeClassMap) {
+        this(new Object[]{fieldName}, String.class, typeClassMap);
+
+    }
 
     /**
      * Конструктор, инициализирующий сериализатор с указанными параметрами.
      *
-     * @param fieldIdPath      путь в конфигурационном узле до поля, содержащего идентификатор типа
-     * @param fieldIdValueClass класс значения идентификатора (например, {@code String.class})
-     * @param typeClassMap     карта сопоставления идентификаторов и классов, подлежащих (де)сериализации
+     * @param fieldIdPath  путь в конфигурационном узле до поля, содержащего идентификатор типа
+     * @param idFieldClass класс идентификатора типа. Нужен для корректной его десириализации. Обычно, то {@link String}
+     * @param typeClassMap карта сопоставления идентификаторов и классов, подлежащих (де)сериализации
      */
-    public ClassForFieldSerializer(Object[] fieldIdPath, Class<K> fieldIdValueClass, Map<Class<? extends T>, K> typeClassMap) {
+    public HierarchyClassSerializer(Object[] fieldIdPath, Class<?> idFieldClass, Map<Class<? extends T>, Object> typeClassMap) {
         this.fieldIdPath = fieldIdPath;
-        this.fieldIdValueClass = fieldIdValueClass;
-        ImmutableBiMap.Builder<Class<? extends T>, K> builder = ImmutableBiMap.builder();
-        for (Map.Entry<Class<? extends T>, K> entry : mapOrdering.sortedCopy(typeClassMap.entrySet())) {
+        this.idFieldClass = idFieldClass;
+        ImmutableBiMap.Builder<Class<? extends T>, Object> builder = ImmutableBiMap.builder();
+        for (Map.Entry<Class<? extends T>, Object> entry : mapOrdering.sortedCopy(typeClassMap.entrySet())) {
             builder.put(entry.getKey(), entry.getValue());
         }
         this.typeClassMap = builder.build();
@@ -187,7 +189,6 @@ public final class ClassForFieldSerializer<T, K> implements TypeSerializer<T> {
      *   <li>С помощью {@link ObjectMapper} происходит загрузка объекта из узла.</li>
      * </ol>
      *
-     *
      * @param type тип объекта (не используется непосредственно, но требуется интерфейсом)
      * @param node конфигурационный узел, из которого производится десериализация
      * @return десериализованный объект типа {@code T}
@@ -195,7 +196,7 @@ public final class ClassForFieldSerializer<T, K> implements TypeSerializer<T> {
      */
     @Override
     public T deserialize(Type type, ConfigurationNode node) throws SerializationException {
-        K fieldIdValue = node.node(fieldIdPath).get(fieldIdValueClass);
+        Object fieldIdValue = node.node(fieldIdPath).get(idFieldClass);
         if (fieldIdValue == null) {
             throw new SerializationException("Could not deserialize object, because exist field id");
         }
@@ -228,7 +229,7 @@ public final class ClassForFieldSerializer<T, K> implements TypeSerializer<T> {
         if (obj == null) {
             throw new SerializationException("Could not serialize object, because object is null");
         }
-        Optional<K> idValueOpt = typeClassMap.entrySet().stream().filter(entry -> entry.getKey().isInstance(obj)).map(Map.Entry::getValue).findFirst();
+        Optional<Object> idValueOpt = typeClassMap.entrySet().stream().filter(entry -> entry.getKey().isInstance(obj)).map(Map.Entry::getValue).findFirst();
         if (idValueOpt.isEmpty()) {
             throw new SerializationException("Could not serialize object, because id field is null");
         }

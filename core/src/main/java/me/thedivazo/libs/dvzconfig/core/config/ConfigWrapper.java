@@ -20,6 +20,7 @@
 package me.thedivazo.libs.dvzconfig.core.config;
 
 import me.thedivazo.libs.dvzconfig.core.util.ReflectionUtil;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.configurate.objectmapping.ConfigSerializable;
 
@@ -28,20 +29,20 @@ import java.nio.file.Path;
 /**
  * Класс, инкапсулирующий в себе низкоуровневую работу с конкретным конфигом
  * Данный класс не рекомендуется к использованию в качестве ключа в Map, т.к. его параметр pathToFile, учитывающиеся в equals и hashCode, можно изменить
+ *
  * @author TheDiVaZo
  * @since 31.01.2025
  */
 public final class ConfigWrapper<T> {
     private final ConfigLoader configLoader;
-    private Path pathToFile;
-    private @Nullable T actualConfig;
+    private volatile Path pathToFile;
+    private volatile @Nullable T actualConfig;
     private final Class<? extends T> configClass;
 
     public ConfigWrapper(Path pathToFile, ConfigLoader configLoader, Class<? extends T> clazz) {
         if (!ReflectionUtil.hasAnnotation(clazz, ConfigSerializable.class)) {
             throw new IllegalArgumentException("Config class has not have @ConfigSerializable annotation");
-        }
-        else if (!ReflectionUtil.hasEmptyConstructor(clazz)) {
+        } else if (!ReflectionUtil.hasEmptyConstructor(clazz)) {
             throw new IllegalArgumentException("Config class has not have empty constructor");
         }
         this.pathToFile = pathToFile;
@@ -50,32 +51,57 @@ public final class ConfigWrapper<T> {
         this.actualConfig = null;
     }
 
+    public static class Factory {
+        private final ConfigLoader configLoader;
+
+        public Factory(ConfigLoader configLoader) {
+            this.configLoader = configLoader;
+        }
+
+        public <T> ConfigWrapper<T> create(Path pathToFile, Class<T> clazz) {
+            return new ConfigWrapper<>(pathToFile, configLoader, clazz);
+        }
+    }
+
     /**
      * Обновляет путь до файла конфигурации. Учьтите, что после обновления пути конфиг необходимо заново загрузить методом {@link #load()}
+     *
      * @param newPath
      */
-    public void updatePath(Path newPath) {
+    public synchronized void updatePath(Path newPath) {
         this.pathToFile = newPath;
     }
 
-    public void load() {
+    public synchronized void load() {
         actualConfig = configLoader.load(pathToFile, configClass, true);
     }
 
-    public void save() {
+    public synchronized void save() {
         configLoader.save(pathToFile, actualConfig);
     }
 
-    public T getConfig() {
+    public synchronized @Nullable T getConfig() {
         return actualConfig;
     }
 
-    public Class<? extends T> getConfigClass() {
+    public synchronized @NonNull T getConfigOrLoad() {
+        if (actualConfig == null) {
+            load();
+        }
+        //Создаем вторую переменную, т.к. при использовании `actualConfig` Checker Framework выдает предупреждение
+        T config = actualConfig;
+        if (config == null) {
+            throw new IllegalStateException("Invalid configuration loading");
+        }
+        return config;
+    }
+
+    public synchronized Class<? extends T> getConfigClass() {
         return configClass;
     }
 
     @Override
-    public boolean equals(@Nullable Object o) {
+    public synchronized boolean equals(@Nullable Object o) {
         if (o == null || getClass() != o.getClass()) return false;
 
         ConfigWrapper<?> that = (ConfigWrapper<?>) o;
@@ -83,11 +109,9 @@ public final class ConfigWrapper<T> {
     }
 
     @Override
-    public int hashCode() {
+    public synchronized int hashCode() {
         int result = pathToFile.hashCode();
         result = 31 * result + configClass.hashCode();
         return result;
     }
-
-
 }

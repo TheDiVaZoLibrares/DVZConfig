@@ -36,32 +36,32 @@ public class ConfigWrapperTest {
 
     @Test
     void testNoEqualsAnyConfig() {
-        ConfigWrapper<TestConfigOne> testConfigOneConfigWrapper = new ConfigWrapper<>(Paths.get("path", "to", "config", "one"), null, new TestConfigOne());
-        ConfigWrapper<TestConfigTwo> testConfigTwoConfigWrapper = new ConfigWrapper<>(Paths.get("path", "to", "config", "two"), null, new TestConfigTwo());
+        ConfigWrapper<TestConfigOne> testConfigOneConfigWrapper = new ConfigWrapper<>(Paths.get("path", "to", "config", "one"), null, TestConfigOne.class);
+        ConfigWrapper<TestConfigTwo> testConfigTwoConfigWrapper = new ConfigWrapper<>(Paths.get("path", "to", "config", "two"), null, TestConfigTwo.class);
 
         assertNotEquals(testConfigOneConfigWrapper, testConfigTwoConfigWrapper);
     }
 
     @Test
     void testEqualsSameConfig() {
-        ConfigWrapper<TestConfigOne> testConfigOneConfigWrapper = new ConfigWrapper<>(Paths.get("path", "to", "config", "one"), null, new TestConfigOne());
-        ConfigWrapper<TestConfigOne> testConfigTwoConfigWrapper = new ConfigWrapper<>(Paths.get("path", "to", "config", "one"), null, new TestConfigOne());
+        ConfigWrapper<TestConfigOne> testConfigOneConfigWrapper = new ConfigWrapper<>(Paths.get("path", "to", "config", "one"), null, TestConfigOne.class);
+        ConfigWrapper<TestConfigOne> testConfigTwoConfigWrapper = new ConfigWrapper<>(Paths.get("path", "to", "config", "one"), null, TestConfigOne.class);
 
         assertEquals(testConfigOneConfigWrapper, testConfigTwoConfigWrapper);
     }
 
     @Test
     void testNotEqualsSamePathConfig() {
-        ConfigWrapper<TestConfigOne> testConfigOneConfigWrapper = new ConfigWrapper<>(Paths.get("path", "to", "config", "one"), null, new TestConfigOne());
-        ConfigWrapper<TestConfigTwo> testConfigTwoConfigWrapper = new ConfigWrapper<>(Paths.get("path", "to", "config", "one"), null, new TestConfigTwo());
+        ConfigWrapper<TestConfigOne> testConfigOneConfigWrapper = new ConfigWrapper<>(Paths.get("path", "to", "config", "one"), null, TestConfigOne.class);
+        ConfigWrapper<TestConfigTwo> testConfigTwoConfigWrapper = new ConfigWrapper<>(Paths.get("path", "to", "config", "one"), null, TestConfigTwo.class);
 
         assertNotEquals(testConfigOneConfigWrapper, testConfigTwoConfigWrapper);
     }
 
     @Test
     void testNotEqualsSameTypeConfig() {
-        ConfigWrapper<TestConfigOne> testConfigOneConfigWrapper = new ConfigWrapper<>(Paths.get("path", "to", "config", "one"), null, new TestConfigOne());
-        ConfigWrapper<TestConfigOne> testConfigTwoConfigWrapper = new ConfigWrapper<>(Paths.get("path", "to", "config", "two"), null, new TestConfigOne());
+        ConfigWrapper<TestConfigOne> testConfigOneConfigWrapper = new ConfigWrapper<>(Paths.get("path", "to", "config", "one"), null, TestConfigOne.class);
+        ConfigWrapper<TestConfigOne> testConfigTwoConfigWrapper = new ConfigWrapper<>(Paths.get("path", "to", "config", "two"), null, TestConfigOne.class);
 
         assertNotEquals(testConfigOneConfigWrapper, testConfigTwoConfigWrapper);
     }

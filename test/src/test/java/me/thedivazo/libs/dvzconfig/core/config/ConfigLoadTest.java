@@ -19,7 +19,8 @@
 
 package me.thedivazo.libs.dvzconfig.core.config;
 
-import me.thedivazo.libs.dvzconfig.core.serializer.ClassForFieldSerializer;
+import me.thedivazo.libs.dvzconfig.core.manager.ConfigManagerImpl;
+import me.thedivazo.libs.dvzconfig.core.serializer.HierarchyClassSerializer;
 import me.thedivazo.libs.dvzconfig.object.*;
 import me.thedivazo.libs.dvzconfig.yaml.YamlConfigLoader;
 import org.junit.jupiter.api.AfterEach;
@@ -40,14 +41,13 @@ import java.nio.file.Paths;
 import java.util.Map;
 import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
-class ConfigManagerTest {
+class ConfigLoadTest {
 
-    private static YamlConfigLoader<TestConfigOne> yamlConfigLoader;
+    private static YamlConfigLoader yamlConfigLoader;
     private static ConfigurationLoader<CommentedConfigurationNode> configurationLoader;
-    private static ClassForFieldSerializer<Animal, String> animalNameSerializer;
+    private static HierarchyClassSerializer<Animal> animalNameSerializer;
     private static ConfigContainer container;
     private static Path path;
 
@@ -57,9 +57,8 @@ class ConfigManagerTest {
 
         System.out.println(path);
 
-        animalNameSerializer = new ClassForFieldSerializer<>(
-                new Object[]{"type"},
-                String.class,
+        animalNameSerializer = new HierarchyClassSerializer<>(
+                "type",
                 Map.of(
                         Animal.class, "animal",
                         Bug.class, "bug",
@@ -68,13 +67,13 @@ class ConfigManagerTest {
                 )
         );
 
-        yamlConfigLoader = new YamlConfigLoader<>(
+        yamlConfigLoader = new YamlConfigLoader(
                 NodeStyle.BLOCK, 4, TypeSerializerCollection.defaults().childBuilder().register(Animal.class, animalNameSerializer).build()
         );
 
         configurationLoader = yamlConfigLoader.getLoader(path);
 
-        container = new ConfigContainer(Set.of(new ConfigWrapper<>(path, yamlConfigLoader, new TestConfigOne())));
+        container = new ConfigContainer(Set.of(new ConfigWrapper<>(path, yamlConfigLoader, TestConfigOne.class)));
     }
 
     @BeforeEach
@@ -86,6 +85,14 @@ class ConfigManagerTest {
     }
 
     @Test
+    void testGetDefaultConfig() {
+        TestConfigOne testConfigOne = yamlConfigLoader.load(path, TestConfigOne.class, false);
+        TestConfigOne expectedTestConfigOne = new TestConfigOne();
+        assertNotNull(testConfigOne);
+        assertEquals(expectedTestConfigOne, testConfigOne);
+    }
+
+    @Test
     void testLoadConfig() throws IOException {
         ConfigManagerImpl configManager = new ConfigManagerImpl(container);
         configManager.load();
@@ -93,7 +100,7 @@ class ConfigManagerTest {
         assertTrue(Files.size(path) > 0);
 
         ConfigurationNode configNode = configurationLoader.load();
-        TestConfigOne actualConfig = configManager.getConfigContainer().getConfig(TestConfigOne.class).getConfig();
+        TestConfigOne actualConfig = configManager.getConfigContainer().getWrapper(TestConfigOne.class).getConfig();
         // Проверка значений
         assertEquals(configNode.node("zoo-name").getString(), actualConfig.getZooName());
 

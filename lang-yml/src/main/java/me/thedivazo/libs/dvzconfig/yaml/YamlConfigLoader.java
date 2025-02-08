@@ -32,19 +32,14 @@ import java.nio.file.Path;
  * @author TheDiVaZo
  * @since 31.01.2025
  */
-public class YamlConfigLoader<T> extends ConfigLoader<T> {
-    private static final YamlConfigLoader<?> DEFAULT = new YamlConfigLoader<>(NodeStyle.BLOCK, 4);
+public class YamlConfigLoader extends ConfigLoader {
+    private static final YamlConfigLoader DEFAULT = new YamlConfigLoader(NodeStyle.BLOCK, 4);
 
     private final int indent;
     private final NodeStyle nodeStyle;
 
-    @SuppressWarnings("unchecked")
-    public static <T> YamlConfigLoader<T> getConfigLoader() {
-        return (YamlConfigLoader<T>) DEFAULT;
-    }
-
-    public static <T> YamlConfigLoader<T> getConfigLoader(TypeSerializerCollection... serializerCollections) {
-        return new YamlConfigLoader<>(NodeStyle.BLOCK, 4, serializerCollections);
+    public static YamlConfigLoader getConfigLoader(TypeSerializerCollection... serializerCollections) {
+        return new YamlConfigLoader(NodeStyle.BLOCK, 4, serializerCollections);
     }
 
     public YamlConfigLoader(NodeStyle nodeStyle, int indent, TypeSerializerCollection... serializerCollections) {
