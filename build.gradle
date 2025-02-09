@@ -7,14 +7,7 @@ plugins {
 }
 
 group = 'me.thedivazo.libs'
-version = '1.0.1-SNAPSHOT'
-
-
-def passwordProperty = new Properties()
-def passwordPropertyFile = rootProject.file('.gradle/gradle.properties')
-if (passwordPropertyFile.exists()) {
-    passwordPropertyFile.withReader('UTF-8') { reader -> passwordProperty.load(reader) }
-}
+version = '1.0.1'
 
 publishing {
     repositories {
