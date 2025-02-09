@@ -20,6 +20,7 @@
 package me.thedivazo.libs.dvzconfig.core.serializer;
 
 import io.leangen.geantyref.TypeToken;
+import org.checkerframework.checker.index.qual.LTEqLengthOf;
 import org.spongepowered.configurate.serialize.ScalarSerializer;
 import org.spongepowered.configurate.serialize.SerializationException;
 
@@ -73,10 +74,13 @@ public abstract class ColorSerializer<C> extends ScalarSerializer<C> {
         final int rgbLength = 6;
         final int argbLength = 8;
 
+        String hex = padStart(Integer.toHexString(argb), argbLength, '0');
+
         int minLength = (argb >> 24 & 0xff) >= 255 ? rgbLength : argbLength;
 
-        return HEX_CHARACTER + padStart(Integer.toHexString(argb), argbLength, '0')
-                .substring(argbLength - minLength, argbLength);
+        return HEX_CHARACTER + hex.substring(
+                (@LTEqLengthOf("hex") int) argbLength - (@LTEqLengthOf("hex") int) minLength,
+                (@LTEqLengthOf("hex") int) argbLength);
     }
 
     @Override
