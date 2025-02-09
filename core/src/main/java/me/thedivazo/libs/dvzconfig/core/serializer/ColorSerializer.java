@@ -19,7 +19,6 @@
 
 package me.thedivazo.libs.dvzconfig.core.serializer;
 
-import com.google.common.base.Strings;
 import io.leangen.geantyref.TypeToken;
 import org.spongepowered.configurate.serialize.ScalarSerializer;
 import org.spongepowered.configurate.serialize.SerializationException;
@@ -29,6 +28,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.function.Predicate;
+
+import static com.google.common.base.Strings.padStart;
 
 /**
  * Абстрактный класс для сериализации и десериализации объектов, представляющих цвет.
@@ -61,15 +62,21 @@ public abstract class ColorSerializer<C> extends ScalarSerializer<C> {
         }
     }
 
+    /**
+     * Если альфа-канал равен 255, сериализует в формате #rrggbb
+     * Иначе в формате #aarrggbb
+     * @param argb
+     * @return
+     */
     protected String serialize(int argb) {
         final char HEX_CHARACTER = '#';
         final int rgbLength = 6;
         final int argbLength = 8;
 
-        String hex = Integer.toHexString(argb);
-        int minLength = hex.length() <= rgbLength ? rgbLength : argbLength;
+        int minLength = (argb >> 24 & 0xff) >= 255 ? rgbLength : argbLength;
 
-        return HEX_CHARACTER + Strings.padEnd(Integer.toHexString(argb), minLength, '0');
+        return HEX_CHARACTER + padStart(Integer.toHexString(argb), argbLength, '0')
+                .substring(argbLength - minLength, argbLength);
     }
 
     @Override
