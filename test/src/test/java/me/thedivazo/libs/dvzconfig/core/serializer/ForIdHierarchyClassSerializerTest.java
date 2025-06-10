@@ -26,20 +26,18 @@ import org.spongepowered.configurate.ConfigurationNode;
 import org.spongepowered.configurate.serialize.SerializationException;
 import org.spongepowered.configurate.yaml.YamlConfigurationLoader;
 
-import java.io.BufferedReader;
-import java.io.StringReader;
 import java.util.Map;
 import java.util.Set;
 
 import static me.thedivazo.libs.dvzconfig.Util.createNode;
 import static org.junit.jupiter.api.Assertions.*;
 
-class HierarchyClassSerializerTest {
-    private static HierarchyClassSerializer<Animal> animalNameSerializer;
+class ForIdHierarchyClassSerializerTest {
+    private static ForIdHierarchyClassSerializer<Animal> animalNameSerializer;
 
     @BeforeAll
     static void setUp() {
-        animalNameSerializer = new HierarchyClassSerializer<>(
+        animalNameSerializer = new ForIdHierarchyClassSerializer<>(
                 "type",
                 Map.of(
                         Bug.class, "bug",
@@ -91,13 +89,5 @@ class HierarchyClassSerializerTest {
         animal.setUnknownParam(Set.of());
         ConfigurationNode node = YamlConfigurationLoader.builder().build().createNode();
         assertThrows(SerializationException.class, () -> animalNameSerializer.serialize(Animal.class, animal, node));
-    }
-
-    private ConfigurationNode createNode(String yaml) {
-        try {
-            return YamlConfigurationLoader.builder().source(() -> new BufferedReader(new StringReader(yaml))).build().load();
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to create test configuration node", e);
-        }
     }
 }

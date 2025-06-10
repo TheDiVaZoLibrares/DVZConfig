@@ -136,7 +136,7 @@ import java.util.Optional;
  * @see ObjectMapper
  * @since 31.01.2025
  */
-public final class HierarchyClassSerializer<T> implements TypeSerializer<T> {
+public final class ForIdHierarchyClassSerializer<T> implements TypeSerializer<T> {
 
     private final Ordering<Map.Entry<Class<? extends T>, Object>> mapOrdering = new Ordering<>() {
         @Override
@@ -156,7 +156,7 @@ public final class HierarchyClassSerializer<T> implements TypeSerializer<T> {
     private final Class<?> idFieldClass;
     private final BiMap<Class<? extends T>, Object> typeClassMap;
 
-    public HierarchyClassSerializer(String fieldName, Map<Class<? extends T>, Object> typeClassMap) {
+    public ForIdHierarchyClassSerializer(String fieldName, Map<Class<? extends T>, Object> typeClassMap) {
         this(new Object[]{fieldName}, String.class, typeClassMap);
 
     }
@@ -168,7 +168,7 @@ public final class HierarchyClassSerializer<T> implements TypeSerializer<T> {
      * @param idFieldClass класс идентификатора типа. Нужен для корректной его десириализации. Обычно, то {@link String}
      * @param typeClassMap карта сопоставления идентификаторов и классов, подлежащих (де)сериализации
      */
-    public HierarchyClassSerializer(Object[] fieldIdPath, Class<?> idFieldClass, Map<Class<? extends T>, Object> typeClassMap) {
+    public ForIdHierarchyClassSerializer(Object[] fieldIdPath, Class<?> idFieldClass, Map<Class<? extends T>, Object> typeClassMap) {
         this.fieldIdPath = fieldIdPath;
         this.idFieldClass = idFieldClass;
         ImmutableBiMap.Builder<Class<? extends T>, Object> builder = ImmutableBiMap.builder();
