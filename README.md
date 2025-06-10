@@ -3,10 +3,10 @@ Configuration library for bukkit plugins based on [Configurate](https://github.c
 
 ## Installation
 At the moment, there is **4 modules**
-1. **Core** - contains the main logic of the library
-2. **Lang-yml** - contains the implementation for YML format
-3. **Platform-Spigot** - contains additional serializers for the Spigot platform
-4. **Platform-Paper** - contains additional serializers for Paper. Includes **Platform-Spigot**
+1. **core** - contains the main logic of the library
+2. **lang-yml** - contains the implementation for YML format
+3. **platform-spigot** - contains additional serializers for the Spigot platform
+4. **platform-paper** - contains additional serializers for Paper. Includes **Platform-Spigot**
 
 ### Maven
 
