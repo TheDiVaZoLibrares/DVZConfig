@@ -31,6 +31,7 @@ import java.io.StringReader;
 import java.util.Map;
 import java.util.Set;
 
+import static me.thedivazo.libs.dvzconfig.Util.createNode;
 import static org.junit.jupiter.api.Assertions.*;
 
 class HierarchyClassSerializerTest {
