@@ -80,7 +80,7 @@ public final class ForIdClassSerializer<T, F> implements TypeSerializer<T> {
             throw new SerializationException("Expected instance of " + parentClass.getName() + ", but got " + obj.getClass().getName());
         }
 
-        Optional<F> value = Maps.filterValues(typeClassMap, clazz -> clazz.equals(obj.getClass()) || type instanceof Class<?> typeClazz && typeClazz.isAssignableFrom(obj.getClass()))
+        Optional<F> value = Maps.filterValues(typeClassMap, clazz -> clazz.equals(obj.getClass()) || type instanceof Class<?> typeClazz && !typeClazz.equals(parentClass) && typeClazz.isAssignableFrom(obj.getClass()))
                 .keySet()
                 .stream()
                 .findAny();
