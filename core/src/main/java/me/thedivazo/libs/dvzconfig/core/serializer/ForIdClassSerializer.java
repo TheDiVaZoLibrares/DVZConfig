@@ -23,6 +23,7 @@ import com.google.common.collect.BiMap;
 import com.google.common.collect.ImmutableBiMap;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Ordering;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.configurate.ConfigurationNode;
 import org.spongepowered.configurate.objectmapping.ObjectMapper;
@@ -138,9 +139,9 @@ public final class ForIdClassSerializer<T, F> implements TypeSerializer<T> {
         private final List<Object> fieldIdPath = new ArrayList<>();
         private final Map<F, Class<? extends T>> typeClassMap = new LinkedHashMap<>();
 
-        private Builder(Class<T> parentClass, Class<F> idFieldClass) {
-            this.parentClass = Objects.requireNonNull(parentClass, "parentClass");
-            this.idFieldClass = Objects.requireNonNull(idFieldClass, "idFieldClass");
+        private Builder(@NonNull Class<T> parentClass, @NonNull Class<F> idFieldClass) {
+            this.parentClass = parentClass;
+            this.idFieldClass = idFieldClass;
         }
 
         // ---------- factory entry point ----------
