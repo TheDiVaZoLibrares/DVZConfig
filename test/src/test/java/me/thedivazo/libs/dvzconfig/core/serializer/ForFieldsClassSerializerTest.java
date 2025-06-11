@@ -56,7 +56,7 @@ public class ForFieldsClassSerializerTest {
         """);
 
         Reward reward = rewardSerializer.deserialize(Reward.class, node);
-        assertTrue(reward instanceof RewardEffect);
+        assertInstanceOf(RewardEffect.class, reward);
 
         RewardEffect effect = (RewardEffect) reward;
         assertEquals(List.of("SPEED", "STRENGTH"), effect.getEffects());
@@ -72,7 +72,7 @@ public class ForFieldsClassSerializerTest {
         """);
 
         Reward reward = rewardSerializer.deserialize(Reward.class, node);
-        assertTrue(reward instanceof RewardItem);
+        assertInstanceOf(RewardItem.class, reward);
 
         RewardItem item = (RewardItem) reward;
         assertEquals(Map.of("sword", 1, "apple", 5), item.getItemsIdAndCounts());
@@ -96,7 +96,7 @@ public class ForFieldsClassSerializerTest {
         ConfigurationNode node = YamlConfigurationLoader.builder().build().createNode();
         rewardSerializer.serialize(Reward.class, item, node);
 
-        assertEquals(3, node.node("itemsIdAndCounts", "diamond").getInt());
+        assertEquals(3, node.node("itemsIdAndCounts", "diamond").get(Integer.class));
     }
 
     @Test
