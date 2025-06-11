@@ -24,7 +24,7 @@ Add the following repository and dependency to your `pom.xml`:
     <dependency>
         <groupId>me.thedivazo.libs.DVZConfig</groupId>
         <artifactId>[module-name]</artifactId>
-        <version>1.0.1</version>
+        <version>1.1.0</version>
     </dependency>
 </dependencies>
 ```
@@ -39,7 +39,7 @@ repositories {
 }
 
 dependencies {
-    implementation("me.thedivazo.libs.DVZConfig:[module-name]:1.0.1")
+    implementation("me.thedivazo.libs.DVZConfig:[module-name]:1.1.0")
 }
 ```
 
@@ -55,7 +55,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'me.thedivazo.libs.DVZConfig:[module-name]:1.0.1'
+    implementation 'me.thedivazo.libs.DVZConfig:[module-name]:1.1.0'
 }
 ```
 
