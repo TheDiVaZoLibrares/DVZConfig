@@ -33,10 +33,7 @@ import org.spongepowered.configurate.serialize.TypeSerializer;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class ForFieldsClassSerializer<T> implements TypeSerializer<T> {
@@ -164,6 +161,75 @@ public class ForFieldsClassSerializer<T> implements TypeSerializer<T> {
             mapper.save(obj, node);
         } catch (Exception e) {
             throw new SerializationException(e);
+        }
+    }
+
+    /* --------BUILDER--------- */
+
+    /**
+     * Fluent-builder для {@link ForFieldsClassSerializer}.
+     *
+     * <pre>
+     * ForFieldsClassSerializer<BaseAnimal> serializer =
+     *         ForFieldsClassSerializer.builder(BaseAnimal.class)
+     *                 .register(Cat.class)
+     *                 .register(Dog.class)
+     *                 .registerAll(extraSet)
+     *                 // .scanPackage("com.myplugin.animals") // если хочешь автоскан
+     *                 .build();
+     * </pre>
+     *
+     * @param <T> базовый (родительский) тип
+     */
+    public static final class Builder<T> {
+
+        /* ===== обязательное ===== */
+        private final Class<T> parentClass;
+
+        /* ===== побочные эффекты, накапливаем ===== */
+        private final Set<Class<? extends T>> classes = new LinkedHashSet<>();
+
+        private Builder(Class<T> parentClass) {
+            this.parentClass = Objects.requireNonNull(parentClass, "parentClass");
+        }
+
+        // -------- factory entry --------
+        public static <T> Builder<T> builder(Class<T> parentClass) {
+            return new Builder<>(parentClass);
+        }
+
+        // -------- manual registration --------
+        public Builder<T> register(Class<? extends T> clazz) {
+            classes.add(Objects.requireNonNull(clazz, "clazz"));
+            return this;
+        }
+
+        @SafeVarargs
+        public final Builder<T> registerAll(Class<? extends T>... clazzes) {
+            Arrays.stream(clazzes).forEach(this::register);
+            return this;
+        }
+
+        public Builder<T> registerAll(Collection<Class<? extends T>> clazzes) {
+            clazzes.forEach(this::register);
+            return this;
+        }
+
+        // -------- optional: scan package for subclasses --------
+//        public Builder<T> scanPackage(String pkg) {
+//            // 🔍 требует dependency: implementation("org.reflections:reflections:0.10.2")
+//            Reflections reflections = new Reflections(pkg);
+//            Set<Class<? extends T>> found = reflections.getSubTypesOf(parentClass);
+//            classes.addAll(found);
+//            return this;
+//        }
+
+        // -------- build --------
+        public ForFieldsClassSerializer<T> build() {
+            if (classes.isEmpty()) {
+                throw new IllegalStateException("❌ No classes registered for " + parentClass.getName());
+            }
+            return new ForFieldsClassSerializer<>(parentClass, Set.copyOf(classes));
         }
     }
 }

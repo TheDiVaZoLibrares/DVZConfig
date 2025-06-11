@@ -30,8 +30,7 @@ import org.spongepowered.configurate.serialize.SerializationException;
 import org.spongepowered.configurate.serialize.TypeSerializer;
 
 import java.lang.reflect.Type;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 public final class ForIdClassSerializer<T, F> implements TypeSerializer<T> {
 
@@ -108,5 +107,92 @@ public final class ForIdClassSerializer<T, F> implements TypeSerializer<T> {
         }
         node.node(fieldIdPath).set(value.get());
         ObjectMapper.factory().get((Class<T>) obj.getClass()).save(obj, node);
+    }
+
+    /* -------- BUILDER ---------- */
+
+    /**
+     * Fluent builder for {@link ForIdClassSerializer}.
+     *
+     * <p>Usage:</p>
+     *
+     * <pre>
+     * ForIdClassSerializer<MyBase, String> serializer = ForIdClassSerializer.builder(MyBase.class, String.class)
+     *         .fieldPath("type")                // path to the id field in the config
+     *         .register("cat", Cat.class)       // id -> impl
+     *         .register("dog", Dog.class)
+     *         .registerAll(extraMap)            // you can still dump a whole map if you have one
+     *         .build();
+     * </pre>
+     *
+     * @param <T> base type of all serialised classes
+     * @param <F> type of the discriminator field (the id)
+     */
+    public static final class Builder<T, F> {
+
+        /* ===== required ===== */
+        private final Class<T> parentClass;
+        private final Class<F> idFieldClass;
+
+        /* ===== optional / incremental ===== */
+        private final List<Object> fieldIdPath = new ArrayList<>();
+        private final Map<F, Class<? extends T>> typeClassMap = new LinkedHashMap<>();
+
+        private Builder(Class<T> parentClass, Class<F> idFieldClass) {
+            this.parentClass = Objects.requireNonNull(parentClass, "parentClass");
+            this.idFieldClass = Objects.requireNonNull(idFieldClass, "idFieldClass");
+        }
+
+        // ---------- factory entry point ----------
+        public static <T, F> Builder<T, F> create(Class<T> parentClass, Class<F> idFieldClass) {
+            return new Builder<>(parentClass, idFieldClass);
+        }
+
+        // or the 👇 convenience alias you’ll actually call
+        public static <T, F> Builder<T, F> builder(Class<T> parentClass, Class<F> idFieldClass) {
+            return create(parentClass, idFieldClass);
+        }
+
+        // ---------- path helpers ----------
+        /** Accept raw Configurate path parts (mixed types allowed). */
+        public Builder<T, F> fieldPath(Object... path) {
+            fieldIdPath.clear();
+            fieldIdPath.addAll(Arrays.asList(path));
+            return this;
+        }
+
+        /** Convenience overload for single-segment string paths. */
+        public Builder<T, F> fieldPath(String single) {
+            return fieldPath((Object) single);
+        }
+
+        // ---------- id-to-class registration ----------
+        public Builder<T, F> register(F id, Class<? extends T> clazz) {
+            typeClassMap.put(
+                    Objects.requireNonNull(id, "id"),
+                    Objects.requireNonNull(clazz, "clazz"));
+            return this;
+        }
+
+        public Builder<T, F> registerAll(Map<F, Class<? extends T>> mappings) {
+            mappings.forEach(this::register);
+            return this;
+        }
+
+        // ---------- finish him ----------
+        public ForIdClassSerializer<T, F> build() {
+            if (fieldIdPath.isEmpty()) {
+                throw new IllegalStateException("fieldIdPath is required but not set");
+            }
+            if (typeClassMap.isEmpty()) {
+                throw new IllegalStateException("No id↔class mappings registered");
+            }
+            return new ForIdClassSerializer<>(
+                    parentClass,
+                    fieldIdPath.toArray(),
+                    idFieldClass,
+                    typeClassMap
+            );
+        }
     }
 }
