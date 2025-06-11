@@ -23,6 +23,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import org.spongepowered.configurate.objectmapping.meta.Setting;
 
 import java.util.Map;
 
@@ -31,5 +32,6 @@ import java.util.Map;
 @AllArgsConstructor
 @NoArgsConstructor
 public class RewardItem extends Reward {
+    @Setting("items-id-and-counts")
     Map<String, Integer> itemsIdAndCounts;
 }

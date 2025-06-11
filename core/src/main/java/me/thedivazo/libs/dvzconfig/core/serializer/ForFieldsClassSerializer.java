@@ -24,11 +24,13 @@ import me.thedivazo.libs.dvzconfig.core.util.ReflectionUtil;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.configurate.ConfigurationNode;
 import org.spongepowered.configurate.objectmapping.ObjectMapper;
+import org.spongepowered.configurate.objectmapping.meta.Setting;
 import org.spongepowered.configurate.serialize.SerializationException;
 import org.spongepowered.configurate.serialize.TypeSerializer;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
@@ -36,34 +38,30 @@ import java.util.stream.Collectors;
 
 public class ForFieldsClassSerializer<T> implements TypeSerializer<T> {
     private final Class<T> parentClass;
-    private final Map<Class<? extends T>, Map<String, Class<?>>> classFields;
+    private final Map<Class<? extends T>, List<Field>> classFields;
 
 
     public ForFieldsClassSerializer(Class<T> parentClass, Set<Class<? extends T>> classes) {
         this.parentClass = parentClass;
         this.classFields = classes.stream()
                 .collect(
-                        Collectors.toMap(Function.identity(), clazz ->
-                                ReflectionUtil.getAllNoTransientFields(clazz).stream()
-                                        .collect(Collectors.toMap(Field::getName, Field::getType))
-                        )
+                        Collectors.toMap(Function.identity(), ReflectionUtil::getAllNoTransientFields)
                 );
     }
 
-    private static boolean isClass(ConfigurationNode node, Map<String, Class<?>> fields) {
-        for (Map.Entry<String, Class<?>> entry : fields.entrySet()) {
-            String key = entry.getKey();
-            Class<?> expectedClass = entry.getValue();
-
+    private static boolean isClass(ConfigurationNode node, List<Field> fields) {
+        if(node.childrenMap().size() != fields.size()) return false;
+        for (Field field : fields) {
+            String key;
+            Setting setting = field.getAnnotation(Setting.class);
+            if (setting != null) {
+                key = setting.value();
+            } else {
+                key = field.getName();
+            }
             ConfigurationNode child = node.node(key);
 
             if (child.virtual() || child.raw() == null) {
-                return false;
-            }
-
-            Object rawValue = child.raw();
-
-            if (!expectedClass.isInstance(rawValue)) {
                 return false;
             }
         }
@@ -77,7 +75,7 @@ public class ForFieldsClassSerializer<T> implements TypeSerializer<T> {
             throw new SerializationException("Expected " + parentClass + " or children, but got " + type);
         }
 
-        Map<Class<? extends T>, Map<String, Class<?>>> findClasses = Maps.filterValues(classFields, fields -> isClass(node, fields));
+        Map<Class<? extends T>, List<Field>> findClasses = Maps.filterValues(classFields, fields -> isClass(node, fields));
         if(findClasses.size() != 1) throw new SerializationException("Expected exactly one class, but got " + findClasses.size());
 
         Class<? extends T> finalyClass = findClasses.keySet().iterator().next();

@@ -23,6 +23,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import org.spongepowered.configurate.objectmapping.meta.Setting;
 
 import java.util.List;
 
@@ -31,6 +32,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class RewardEffect extends Reward {
+    @Setting("effects")
     List<String> effects;
     Double durable;
 }

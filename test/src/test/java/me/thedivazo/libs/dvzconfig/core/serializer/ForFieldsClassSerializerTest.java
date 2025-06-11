@@ -66,7 +66,7 @@ public class ForFieldsClassSerializerTest {
     @Test
     void testDeserializeRewardItem() throws SerializationException {
         ConfigurationNode node = Util.createNode("""
-            itemsIdAndCounts:
+            items-id-and-counts:
               sword: 1
               apple: 5
         """);
@@ -96,7 +96,7 @@ public class ForFieldsClassSerializerTest {
         ConfigurationNode node = YamlConfigurationLoader.builder().build().createNode();
         rewardSerializer.serialize(Reward.class, item, node);
 
-        assertEquals(3, node.node("itemsIdAndCounts", "diamond").get(Integer.class));
+        assertEquals(3, node.node("items-id-and-counts", "diamond").get(Integer.class));
     }
 
     @Test
@@ -116,7 +116,7 @@ public class ForFieldsClassSerializerTest {
             effects:
               - SPEED
             durable: 60.0
-            itemsIdAndCounts:
+            items-id-and-counts:
               sword: 1
         """);
 
