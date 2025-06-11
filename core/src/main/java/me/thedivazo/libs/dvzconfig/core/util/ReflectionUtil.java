@@ -21,9 +21,9 @@ package me.thedivazo.libs.dvzconfig.core.util;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * @author TheDiVaZo
@@ -40,8 +40,8 @@ public final class ReflectionUtil {
                 .anyMatch(constructor -> constructor.getParameterCount() == 0);
     }
 
-    public static List<Field> getAllNoTransientFields(Class<?> clazz) {
-        List<Field> fields = new ArrayList<>();
+    public static Set<Field> getAllNoTransientFields(Class<?> clazz) {
+        Set<Field> fields = new HashSet<>();
         Class<?> current = clazz;
         while (current != null && current != Object.class) {
             for (Field field : current.getDeclaredFields()) {

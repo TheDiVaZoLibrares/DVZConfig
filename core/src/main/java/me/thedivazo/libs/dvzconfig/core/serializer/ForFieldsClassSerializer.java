@@ -19,7 +19,10 @@
 
 package me.thedivazo.libs.dvzconfig.core.serializer;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Ordering;
+import com.google.common.collect.Sets;
 import me.thedivazo.libs.dvzconfig.core.util.ReflectionUtil;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.configurate.ConfigurationNode;
@@ -30,27 +33,83 @@ import org.spongepowered.configurate.serialize.TypeSerializer;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
-import java.util.List;
+import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class ForFieldsClassSerializer<T> implements TypeSerializer<T> {
+    private final Ordering<Map.Entry<Class<? extends T>, Set<Field>>> MAP_ORDERING = new Ordering<>() {
+        @Override
+        public int compare(Map.Entry<Class<? extends T>, Set<Field>> left, Map.Entry<Class<? extends T>, Set<Field>> right) {
+            Class<? extends T> leftClass = left.getKey();
+            Class<? extends T> rightClass = right.getKey();
+            if (leftClass.isAssignableFrom(rightClass)) {
+                return 1; // leftClass является родительским классом rightClass – помещаем его ниже
+            } else if (rightClass.isAssignableFrom(leftClass)) {
+                return -1; // rightClass является родительским классом leftClass – leftClass будет выше
+            }
+            return 0; // классы равнозначны (например, совпадают)
+        }
+    };
+
+    public record CustomMapEntry<T>(Class<? extends T> clazz,
+                                    Set<Field> values) implements Map.Entry<Class<? extends T>, Set<Field>> {
+
+        @Override
+        public Class<? extends T> getKey() {
+            return clazz;
+        }
+
+        @Override
+        public Set<Field> getValue() {
+            return values;
+        }
+
+        @Override
+        public Set<Field> setValue(Set<Field> value) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public boolean equals(@Nullable Object o) {
+            if (o == null || getClass() != o.getClass()) return false;
+
+            CustomMapEntry<?> customMapEntry = (CustomMapEntry<?>) o;
+            return clazz.equals(customMapEntry.clazz);
+        }
+
+        @Override
+        public int hashCode() {
+            return clazz.hashCode();
+        }
+    }
+
     private final Class<T> parentClass;
-    private final Map<Class<? extends T>, List<Field>> classFields;
+    private final Map<Class<? extends T>, Set<Field>> classFields;
 
 
     public ForFieldsClassSerializer(Class<T> parentClass, Set<Class<? extends T>> classes) {
         this.parentClass = parentClass;
         this.classFields = classes.stream()
+                .map(clazz -> new CustomMapEntry<T>(clazz, ReflectionUtil.getAllNoTransientFields(clazz)))
+                .sorted(MAP_ORDERING)
                 .collect(
-                        Collectors.toMap(Function.identity(), ReflectionUtil::getAllNoTransientFields)
+                        Collectors.collectingAndThen(
+                                Collectors.toMap(
+                                        entry -> entry.getKey(),
+                                        (CustomMapEntry<T> entry) -> entry.getValue(),    // лямбда вместо метода
+                                        (Set<Field> a, Set<Field> b) -> Sets.union(a, b),
+                                        LinkedHashMap::new
+                                ),
+                                ImmutableMap::copyOf
+                        )
                 );
     }
 
-    private static boolean isClass(ConfigurationNode node, List<Field> fields) {
-        if(node.childrenMap().size() != fields.size()) return false;
+    private static boolean isClass(ConfigurationNode node, Set<Field> fields) {
+        if (node.childrenMap().size() != fields.size()) return false;
         for (Field field : fields) {
             String key;
             Setting setting = field.getAnnotation(Setting.class);
@@ -75,8 +134,9 @@ public class ForFieldsClassSerializer<T> implements TypeSerializer<T> {
             throw new SerializationException("Expected " + parentClass + " or children, but got " + type);
         }
 
-        Map<Class<? extends T>, List<Field>> findClasses = Maps.filterValues(classFields, fields -> isClass(node, fields));
-        if(findClasses.size() != 1) throw new SerializationException("Expected exactly one class, but got " + findClasses.size());
+        Map<Class<? extends T>, Set<Field>> findClasses = Maps.filterValues(classFields, fields -> isClass(node, fields));
+        if (findClasses.size() != 1)
+            throw new SerializationException("Expected exactly one class, but got " + findClasses.size());
 
         Class<? extends T> finalyClass = findClasses.keySet().iterator().next();
 
@@ -93,14 +153,14 @@ public class ForFieldsClassSerializer<T> implements TypeSerializer<T> {
             throw new SerializationException("Expected instance of " + parentClass.getName() + ", but got " + obj.getClass().getName());
         }
 
-        Class<?> objClass = obj.getClass();
+        Optional<Class<? extends T>> objClass = classFields.keySet().stream().filter(clazz->clazz.isInstance(obj)).findFirst();
 
-        if (!classFields.containsKey(objClass)) {
-            throw new SerializationException("Unknown class for serialization: " + objClass.getName());
+        if (objClass.isEmpty()) {
+            throw new SerializationException("Unknown class for serialization: " + obj.getClass().getName());
         }
 
         try {
-            ObjectMapper<T> mapper = (ObjectMapper<T>) ObjectMapper.factory().get(objClass);
+            ObjectMapper<T> mapper = (ObjectMapper<T>) ObjectMapper.factory().get(objClass.get());
             mapper.save(obj, node);
         } catch (Exception e) {
             throw new SerializationException(e);
