@@ -19,7 +19,11 @@
 
 package me.thedivazo.libs.dvzconfig.core.util;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * @author TheDiVaZo
@@ -34,5 +38,20 @@ public final class ReflectionUtil {
     public static boolean hasEmptyConstructor(Class<?> clazz) {
         return Arrays.stream(clazz.getDeclaredConstructors())
                 .anyMatch(constructor -> constructor.getParameterCount() == 0);
+    }
+
+    public static List<Field> getAllNoTransientFields(Class<?> clazz) {
+        List<Field> fields = new ArrayList<>();
+        Class<?> current = clazz;
+        while (current != null && current != Object.class) {
+            for (Field field : current.getDeclaredFields()) {
+                // Пропускаем transient поля
+                if (!Modifier.isTransient(field.getModifiers())) {
+                    fields.add(field);
+                }
+            }
+            current = current.getSuperclass();
+        }
+        return fields;
     }
 }

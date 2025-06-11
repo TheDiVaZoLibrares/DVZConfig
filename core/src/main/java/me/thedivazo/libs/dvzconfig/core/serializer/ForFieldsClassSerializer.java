@@ -20,6 +20,7 @@
 package me.thedivazo.libs.dvzconfig.core.serializer;
 
 import com.google.common.collect.Maps;
+import me.thedivazo.libs.dvzconfig.core.util.ReflectionUtil;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.configurate.ConfigurationNode;
 import org.spongepowered.configurate.objectmapping.ObjectMapper;
@@ -28,7 +29,6 @@ import org.spongepowered.configurate.serialize.TypeSerializer;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
-import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
@@ -44,7 +44,7 @@ public class ForFieldsClassSerializer<T> implements TypeSerializer<T> {
         this.classFields = classes.stream()
                 .collect(
                         Collectors.toMap(Function.identity(), clazz ->
-                                Arrays.stream(clazz.getFields())
+                                ReflectionUtil.getAllNoTransientFields(clazz).stream()
                                         .collect(Collectors.toMap(Field::getName, Field::getType))
                         )
                 );
@@ -77,10 +77,10 @@ public class ForFieldsClassSerializer<T> implements TypeSerializer<T> {
             throw new SerializationException("Expected " + parentClass + " or children, but got " + type);
         }
 
-        Map<Class<? extends T>, Map<String, Class<?>>> findedClass = Maps.filterValues(classFields, fields -> isClass(node, fields));
-        if(findedClass.size() != 1) throw new SerializationException("Expected exactly one class, but got " + findedClass.size());
+        Map<Class<? extends T>, Map<String, Class<?>>> findClasses = Maps.filterValues(classFields, fields -> isClass(node, fields));
+        if(findClasses.size() != 1) throw new SerializationException("Expected exactly one class, but got " + findClasses.size());
 
-        Class<? extends T> finalyClass = findedClass.keySet().iterator().next();
+        Class<? extends T> finalyClass = findClasses.keySet().iterator().next();
 
         return ObjectMapper.factory().get(finalyClass).load(node);
     }
