@@ -1,6 +1,6 @@
 package java.util;
 
-org.checkerframework.checker.nullness.qual.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class Objects
 {
