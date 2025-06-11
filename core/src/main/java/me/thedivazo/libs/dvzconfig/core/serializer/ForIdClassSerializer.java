@@ -22,6 +22,7 @@ package me.thedivazo.libs.dvzconfig.core.serializer;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.ImmutableBiMap;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Ordering;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.configurate.ConfigurationNode;
 import org.spongepowered.configurate.objectmapping.ObjectMapper;
@@ -34,6 +35,20 @@ import java.util.Optional;
 
 public final class ForIdClassSerializer<T, F> implements TypeSerializer<T> {
 
+    private final Ordering<Map.Entry<F, Class<? extends T>>> MAP_ORDERING = new Ordering<>() {
+        @Override
+        public int compare(Map.Entry<F, Class<? extends T>> left, Map.Entry<F, Class<? extends T>> right) {
+            Class<? extends T> leftClass = left.getValue();
+            Class<? extends T> rightClass = right.getValue();
+            if (leftClass.isAssignableFrom(rightClass)) {
+                return 1; // leftClass является родительским классом rightClass – помещаем его ниже
+            } else if (rightClass.isAssignableFrom(leftClass)) {
+                return -1; // rightClass является родительским классом leftClass – leftClass будет выше
+            }
+            return 0; // классы равнозначны (например, совпадают)
+        }
+    };
+
     private final Class<T> parentClass;
     private final Object[] fieldIdPath;
     private final Class<F> idFieldClass;
@@ -43,7 +58,11 @@ public final class ForIdClassSerializer<T, F> implements TypeSerializer<T> {
         this.parentClass = parentClass;
         this.fieldIdPath = fieldIdPath;
         this.idFieldClass = idFieldClass;
-        this.typeClassMap = ImmutableBiMap.copyOf(typeClassMap);
+        ImmutableBiMap.Builder<F, Class<? extends T>> builder = ImmutableBiMap.builder();
+        for (Map.Entry<F, Class<? extends T>> entry : MAP_ORDERING.sortedCopy(typeClassMap.entrySet())) {
+            builder.put(entry.getKey(), entry.getValue());
+        }
+        this.typeClassMap = builder.build();
 
     }
 
@@ -80,7 +99,7 @@ public final class ForIdClassSerializer<T, F> implements TypeSerializer<T> {
             throw new SerializationException("Expected instance of " + parentClass.getName() + ", but got " + obj.getClass().getName());
         }
 
-        Optional<F> value = Maps.filterValues(typeClassMap, clazz -> clazz.equals(obj.getClass()) || type instanceof Class<?> typeClazz && !typeClazz.equals(parentClass) && typeClazz.isAssignableFrom(obj.getClass()))
+        Optional<F> value = Maps.filterValues(typeClassMap, clazz -> clazz.isInstance(obj))
                 .keySet()
                 .stream()
                 .findAny();
