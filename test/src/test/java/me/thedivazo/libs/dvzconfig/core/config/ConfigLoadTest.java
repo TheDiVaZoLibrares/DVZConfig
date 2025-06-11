@@ -20,7 +20,7 @@
 package me.thedivazo.libs.dvzconfig.core.config;
 
 import me.thedivazo.libs.dvzconfig.core.manager.ConfigManagerImpl;
-import me.thedivazo.libs.dvzconfig.core.serializer.ForIdHierarchyClassSerializer;
+import me.thedivazo.libs.dvzconfig.core.serializer.ForIdClassSerializer;
 import me.thedivazo.libs.dvzconfig.object.*;
 import me.thedivazo.libs.dvzconfig.yaml.YamlConfigLoader;
 import org.junit.jupiter.api.AfterEach;
@@ -47,7 +47,7 @@ class ConfigLoadTest {
 
     private static YamlConfigLoader yamlConfigLoader;
     private static ConfigurationLoader<CommentedConfigurationNode> configurationLoader;
-    private static ForIdHierarchyClassSerializer<Animal> animalNameSerializer;
+    private static ForIdClassSerializer<Animal, String> animalNameSerializer;
     private static ConfigContainer container;
     private static Path path;
 
@@ -57,13 +57,13 @@ class ConfigLoadTest {
 
         System.out.println(path);
 
-        animalNameSerializer = new ForIdHierarchyClassSerializer<>(
+        animalNameSerializer = ForIdClassSerializer.createSimpleForIdClassSerializer(
+                Animal.class,
                 "type",
                 Map.of(
-                        Animal.class, "animal",
-                        Bug.class, "bug",
-                        Cat.class, "cat",
-                        Cow.class, "cow"
+                        "bug", Bug.class,
+                        "cat", Cat.class,
+                        "cow", Cow.class
                 )
         );
 

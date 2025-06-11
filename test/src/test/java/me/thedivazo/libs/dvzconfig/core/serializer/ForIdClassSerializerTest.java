@@ -32,17 +32,18 @@ import java.util.Set;
 import static me.thedivazo.libs.dvzconfig.Util.createNode;
 import static org.junit.jupiter.api.Assertions.*;
 
-class ForIdHierarchyClassSerializerTest {
-    private static ForIdHierarchyClassSerializer<Animal> animalNameSerializer;
+class ForIdClassSerializerTest {
+    private static ForIdClassSerializer<Animal, String> animalNameSerializer;
 
     @BeforeAll
     static void setUp() {
-        animalNameSerializer = new ForIdHierarchyClassSerializer<>(
+        animalNameSerializer = ForIdClassSerializer.createSimpleForIdClassSerializer(
+                Animal.class,
                 "type",
                 Map.of(
-                        Bug.class, "bug",
-                        Cat.class, "cat",
-                        Cow.class, "cow"
+                        "bug", Bug.class,
+                        "cat", Cat.class,
+                        "cow", Cow.class
                 )
         );
     }
