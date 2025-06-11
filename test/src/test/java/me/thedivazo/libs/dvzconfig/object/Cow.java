@@ -23,15 +23,22 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.spongepowered.configurate.objectmapping.ConfigSerializable;
 
 /**
  * @author TheDiVaZo
  * @since 05.02.2025
  */
+@ConfigSerializable
 @NoArgsConstructor
 @Setter
 @Getter
 @EqualsAndHashCode(callSuper = true)
 public class Cow extends Animal {
     boolean isPregnant;
+    public Cow(int age, String name, boolean pregnant) {
+        setAge(age);
+        setName(name);
+        this.isPregnant = pregnant;
+    }
 }

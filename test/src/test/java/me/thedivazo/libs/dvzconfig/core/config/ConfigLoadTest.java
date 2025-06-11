@@ -98,6 +98,7 @@ class ConfigLoadTest {
         configManager.load();
         assertTrue(Files.exists(path));
         assertTrue(Files.size(path) > 0);
+        System.out.println(String.join("\n", Files.readAllLines(path)));
 
         ConfigurationNode configNode = configurationLoader.load();
         TestConfigOne actualConfig = configManager.getConfigContainer().getWrapper(TestConfigOne.class).getConfig();
@@ -105,6 +106,7 @@ class ConfigLoadTest {
         assertEquals(configNode.node("zoo-name").getString(), actualConfig.getZooName());
 
         // Сравнение объекта cow
+        assertEquals(configNode.node("cow", "type").getString(), "cow");
         assertEquals(configNode.node("cow", "name").getString(), actualConfig.getCow().getName());
         assertEquals(configNode.node("cow", "age").getInt(), actualConfig.getCow().getAge());
         assertEquals(configNode.node("cow", "is-pregnant").getBoolean(), actualConfig.getCow().isPregnant());

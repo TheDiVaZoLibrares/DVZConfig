@@ -24,7 +24,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.spongepowered.configurate.objectmapping.ConfigSerializable;
+import org.spongepowered.configurate.objectmapping.meta.Setting;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -45,17 +47,9 @@ public class TestConfigOne {
         setPregnant(true);
     }};
 
-    private Map<String, Animal> map = Map.of(
-            "papapa",
-            new Cow() {{
-                setPregnant(true);
-                setAge(2);
-                setName("Papapa");
-            }},
-            "pepepe",
-            new Cat() {{
-                setAge(5);
-                setName("Pepepe");
-                setColor("red");
-            }});
+    @Setting("map")
+    private Map<String, Animal> map = new HashMap<>() {{
+        put("papapa", new Cow(2, "Papapa", true));
+        put("pepepe", new Cat(5, "Pepepe", "red"));
+    }};
 }

@@ -23,15 +23,22 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.spongepowered.configurate.objectmapping.ConfigSerializable;
 
 /**
  * @author TheDiVaZo
  * @since 05.02.2025
  */
+@ConfigSerializable
 @NoArgsConstructor
 @Getter
 @Setter
 @EqualsAndHashCode(callSuper = true)
 public class Cat extends Animal{
     private String color;
+    public Cat(int age, String name, String color) {
+        setAge(age);
+        setName(name);
+        this.color = color;
+    }
 }
