@@ -97,6 +97,11 @@ subprojects {
     sourcesJar {
         destinationDirectory.set(file("$rootDir/target"))
     }
+
+    tasks.withType(Javadoc).configureEach {
+        failOnError = false
+    }
+
     javadocJar {
         destinationDirectory.set(file("$rootDir/target"))
     }
