@@ -50,7 +50,7 @@ Add the following to your `build.gradle`:
 ```groovy
 repositories {
     maven {
-        url("https://mymavenrepo.com/repo/AzWPavD3lYKKBaGswiVO/")
+        url = uri("https://mymavenrepo.com/repo/AzWPavD3lYKKBaGswiVO/")
     }
 }
 
