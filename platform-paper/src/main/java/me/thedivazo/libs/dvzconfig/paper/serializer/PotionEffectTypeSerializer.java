@@ -19,8 +19,6 @@
 
 package me.thedivazo.libs.dvzconfig.paper.serializer;
 
-import org.bukkit.NamespacedKey;
-import org.bukkit.Registry;
 import org.bukkit.potion.PotionEffectType;
 import org.spongepowered.configurate.serialize.CoercionFailedException;
 import org.spongepowered.configurate.serialize.ScalarSerializer;
@@ -45,13 +43,13 @@ public class PotionEffectTypeSerializer extends ScalarSerializer<PotionEffectTyp
     public PotionEffectType deserialize(Type type, Object value) throws SerializationException {
         final String potential = value.toString().toLowerCase(Locale.ROOT);
 
-        PotionEffectType potionEffectType = Registry.POTION_EFFECT_TYPE.get(NamespacedKey.minecraft(potential));
+        PotionEffectType potionEffectType = PotionEffectType.getByName(potential);
         if (potionEffectType == null) throw new CoercionFailedException(type, value, "potion_effect_type");
         return potionEffectType;
     }
 
     @Override
     protected Object serialize(PotionEffectType item, Predicate<Class<?>> typeSupported) {
-        return item.getKey().value();
+        return item.getName();
     }
 }
