@@ -35,5 +35,9 @@ import org.spongepowered.configurate.objectmapping.ConfigSerializable;
 @Setter
 @EqualsAndHashCode(callSuper = true)
 public class Bug extends Animal {
+    {
+        type = "bug";
+    }
+
     private int countLegs;
 }

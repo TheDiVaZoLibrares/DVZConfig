@@ -35,6 +35,10 @@ import org.spongepowered.configurate.objectmapping.ConfigSerializable;
 @Getter
 @EqualsAndHashCode(callSuper = true)
 public class Cow extends Animal {
+    {
+        type = "cow";
+    }
+
     boolean isPregnant;
     public Cow(int age, String name, boolean pregnant) {
         setAge(age);

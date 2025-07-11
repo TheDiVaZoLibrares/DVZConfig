@@ -96,7 +96,7 @@ public abstract class ColorSerializer<C> extends ScalarSerializer<C> {
 
         int argb = Optional
                 .ofNullable(argbOrNull)
-                .orElseThrow(() -> new SerializationException("Could not deserialize color from string: " + str));
+                .orElseThrow(() -> new SerializationException(type, "Could not deserialize color from string: " + str));
         return fromARGB(argb);
     }
     @Override

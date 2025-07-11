@@ -35,68 +35,91 @@ import java.util.*;
 
 public final class ForIdClassSerializer<T, F> implements TypeSerializer<T> {
 
-    private final Ordering<Map.Entry<F, Class<? extends T>>> MAP_ORDERING = new Ordering<>() {
-        @Override
-        public int compare(Map.Entry<F, Class<? extends T>> left, Map.Entry<F, Class<? extends T>> right) {
-            Class<? extends T> leftClass = left.getValue();
-            Class<? extends T> rightClass = right.getValue();
-            if (leftClass.isAssignableFrom(rightClass)) {
-                return 1; // leftClass является родительским классом rightClass – помещаем его ниже
-            } else if (rightClass.isAssignableFrom(leftClass)) {
-                return -1; // rightClass является родительским классом leftClass – leftClass будет выше
-            }
-            return 0; // классы равнозначны (например, совпадают)
-        }
-    };
-
+    private final ObjectMapper.Factory mapperFactory;
     private final Class<T> parentClass;
-    private final Object[] fieldIdPath;
+    private final Object[] fieldIdKey;
     private final Class<F> idFieldClass;
     private final BiMap<F, Class<? extends T>> typeClassMap;
+    private final Map<Class<? extends T>, TypeSerializer<? extends T>> customSerializers;
 
-    public ForIdClassSerializer(Class<T> parentClass, Object[] fieldIdPath, Class<F> idFieldClass, Map<F, Class<? extends T>> typeClassMap) {
+    public ForIdClassSerializer(ObjectMapper.Factory factory, Class<T> parentClass, Object[] fieldIdKey, Class<F> idFieldClass, Map<F, Class<? extends T>> typeClassMap, Map<Class<? extends T>, TypeSerializer<? extends T>> customSerializers) {
+        this.mapperFactory = factory;
         this.parentClass = parentClass;
-        this.fieldIdPath = fieldIdPath;
+        this.fieldIdKey = fieldIdKey;
         this.idFieldClass = idFieldClass;
         ImmutableBiMap.Builder<F, Class<? extends T>> builder = ImmutableBiMap.builder();
+
+        // leftClass является родительским классом rightClass – помещаем его ниже
+        // rightClass является родительским классом leftClass – leftClass будет выше
+        // классы равнозначны (например, совпадают)
+        Ordering<Map.Entry<F, Class<? extends T>>> MAP_ORDERING = new Ordering<>() {
+            @Override
+            public int compare(Map.Entry<F, Class<? extends T>> left, Map.Entry<F, Class<? extends T>> right) {
+                Class<? extends T> leftClass = left.getValue();
+                Class<? extends T> rightClass = right.getValue();
+                if (leftClass.isAssignableFrom(rightClass)) {
+                    return 1; // leftClass является родительским классом rightClass – помещаем его ниже
+                } else if (rightClass.isAssignableFrom(leftClass)) {
+                    return -1; // rightClass является родительским классом leftClass – leftClass будет выше
+                }
+                return 0; // классы равнозначны (например, совпадают)
+            }
+        };
+
         for (Map.Entry<F, Class<? extends T>> entry : MAP_ORDERING.sortedCopy(typeClassMap.entrySet())) {
             builder.put(entry.getKey(), entry.getValue());
         }
         this.typeClassMap = builder.build();
 
+        this.customSerializers = Map.copyOf(customSerializers);
+
     }
 
     public static <T> ForIdClassSerializer<T, String> createSimpleForIdClassSerializer(Class<T> parentClass, String fieldName, Map<String, Class<? extends T>> typeClassMap) {
-        return new ForIdClassSerializer<>(parentClass, new Object[]{fieldName}, String.class, typeClassMap);
+        return new ForIdClassSerializer<>(ObjectMapper.factory(), parentClass, new Object[]{fieldName}, String.class, typeClassMap, Map.of());
     }
 
     @Override
     public T deserialize(Type type, ConfigurationNode node) throws SerializationException {
         if (!(type instanceof Class<?>) || !parentClass.isAssignableFrom((Class<?>) type)) {
-            throw new SerializationException("Expected " + parentClass + " or children, but got " + type);
+            throw new SerializationException(node, type, "Expected " + parentClass + " or children, but got " + type);
         }
 
-        F fieldIdValue = node.node(fieldIdPath).get(idFieldClass);
+        F fieldIdValue = node.node(fieldIdKey).get(idFieldClass);
         if (fieldIdValue == null) {
-            throw new SerializationException("Could not deserialize object, because exist field id");
+            throw new SerializationException(node, type, "Could not deserialize object, because exist field id");
         }
 
         Class<? extends T> clazz = typeClassMap.get(fieldIdValue);
 
         if (clazz == null) {
-            throw new SerializationException("Could not deserialize object, because class for field id not found");
+            throw new SerializationException(node, type, "Could not deserialize object, because class for field id not found");
         }
-        return ObjectMapper.factory().get(clazz).load(node);
+
+        Optional<TypeSerializer<? extends T>> serializer = Optional.ofNullable(customSerializers.get(clazz));
+
+        if (serializer.isPresent()) {
+            return serializer.get().deserialize(type, node);
+        }
+        else {
+            return mapperFactory.get(clazz).load(node);
+        }
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public void serialize(Type type, @Nullable T obj, ConfigurationNode node) throws SerializationException {
-        if (obj == null)
-            throw new SerializationException("Could not serialize object, because object is null");
+        if (obj == null) {
+            final ConfigurationNode id = node.node(fieldIdKey);
+            node.set(null);
+            if (!id.virtual()) {
+                node.node(fieldIdKey).set(id);
+            }
+            return;
+        }
 
         if (!parentClass.isInstance(obj)) {
-            throw new SerializationException("Expected instance of " + parentClass.getName() + ", but got " + obj.getClass().getName());
+            throw new SerializationException(node, type, "Expected instance of " + parentClass.getName() + ", but got " + obj.getClass().getName());
         }
 
         Optional<F> value = Maps.filterValues(typeClassMap, clazz -> clazz.isInstance(obj))
@@ -104,10 +127,25 @@ public final class ForIdClassSerializer<T, F> implements TypeSerializer<T> {
                 .stream()
                 .findAny();
         if (value.isEmpty()) {
-            throw new SerializationException("Could not serialize object, because class object has not registered in serializer");
+            throw new SerializationException(node, type, "Could not serialize object, because class object has not registered in serializer");
         }
-        node.node(fieldIdPath).set(value.get());
-        ObjectMapper.factory().get((Class<T>) obj.getClass()).save(obj, node);
+
+        Class<T> clazz = (Class<T>) typeClassMap.get(value.get());
+
+        if (clazz == null) {
+            throw new SerializationException(node, type, "Could not serialize object, because class object has not registered in serializer");
+        }
+
+        node.node(fieldIdKey).set(value.get());
+
+        TypeSerializer<T> serializer = (TypeSerializer<T>) customSerializers.get(clazz);
+
+        if (serializer != null) {
+            serializer.serialize(type, obj, node);
+        }
+        else {
+            mapperFactory.get(clazz).save(obj, node);
+        }
     }
 
     /* -------- BUILDER ---------- */
@@ -136,8 +174,11 @@ public final class ForIdClassSerializer<T, F> implements TypeSerializer<T> {
         private final Class<F> idFieldClass;
 
         /* ===== optional / incremental ===== */
+        private ObjectMapper.Factory mapperFactory = ObjectMapper.factory();
         private final List<Object> fieldIdPath = new ArrayList<>();
         private final Map<F, Class<? extends T>> typeClassMap = new LinkedHashMap<>();
+
+        private final Map<Class<? extends T>, TypeSerializer<? extends T>> customSerializers = new LinkedHashMap<>();
 
         private Builder(@NonNull Class<T> parentClass, @NonNull Class<F> idFieldClass) {
             this.parentClass = parentClass;
@@ -154,7 +195,6 @@ public final class ForIdClassSerializer<T, F> implements TypeSerializer<T> {
             return create(parentClass, idFieldClass);
         }
 
-        // ---------- path helpers ----------
         /** Accept raw Configurate path parts (mixed types allowed). */
         public Builder<T, F> fieldPath(Object... path) {
             fieldIdPath.clear();
@@ -167,16 +207,34 @@ public final class ForIdClassSerializer<T, F> implements TypeSerializer<T> {
             return fieldPath((Object) single);
         }
 
-        // ---------- id-to-class registration ----------
-        public Builder<T, F> register(F id, Class<? extends T> clazz) {
+        public Builder<T, F> mapperFactory(ObjectMapper.Factory factory) {
+            if (factory != null) {
+                this.mapperFactory = factory;
+            }
+            return this;
+        }
+
+        public Builder<T, F> registerClass(F id, Class<? extends T> clazz) {
             typeClassMap.put(
                     Objects.requireNonNull(id, "id"),
                     Objects.requireNonNull(clazz, "clazz"));
             return this;
         }
 
-        public Builder<T, F> registerAll(Map<F, Class<? extends T>> mappings) {
-            mappings.forEach(this::register);
+        public Builder<T, F> registerClasses(Map<F, Class<? extends T>> mappings) {
+            mappings.forEach(this::registerClass);
+            return this;
+        }
+
+        public Builder<T, F> registerSerializer(Class<? extends T> clazz, TypeSerializer<? extends T> typeSerializer) {
+            customSerializers.put(
+                    Objects.requireNonNull(clazz, "id"),
+                    Objects.requireNonNull(typeSerializer, "typeSerializer"));
+            return this;
+        }
+
+        public Builder<T, F> registerSerializers(Map<Class<? extends T>, TypeSerializer<? extends T>> typeSerializerMap) {
+            typeSerializerMap.forEach(this::registerSerializer);
             return this;
         }
 
@@ -189,10 +247,12 @@ public final class ForIdClassSerializer<T, F> implements TypeSerializer<T> {
                 throw new IllegalStateException("No id↔class mappings registered");
             }
             return new ForIdClassSerializer<>(
+                    mapperFactory,
                     parentClass,
                     fieldIdPath.toArray(),
                     idFieldClass,
-                    typeClassMap
+                    typeClassMap,
+                    customSerializers
             );
         }
     }

@@ -34,8 +34,13 @@ import org.spongepowered.configurate.objectmapping.ConfigSerializable;
 @Getter
 @Setter
 @EqualsAndHashCode(callSuper = true)
-public class Cat extends Animal{
+public class Cat extends Animal {
+    {
+        type = "cat";
+    }
+
     private String color;
+
     public Cat(int age, String name, String color) {
         setAge(age);
         setName(name);

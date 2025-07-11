@@ -26,7 +26,6 @@ import lombok.Setter;
 import org.spongepowered.configurate.objectmapping.ConfigSerializable;
 import org.spongepowered.configurate.objectmapping.meta.Setting;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -41,12 +40,6 @@ import java.util.Map;
 @EqualsAndHashCode
 public class TestConfigOne {
     private String zooName = "moscow zoo";
-
-    private RewardItem rewardItem = new RewardItem() {{
-        setItemsIdAndCounts(new HashMap<>(){{put("moscow", 1);put("zoo", 1);}});
-    }};
-
-    private RewardEffect rewardEffect = new RewardEffect(new ArrayList<>(){{add("SPEED");}}, 90d);
 
     private Cow cow = new Cow(){{
         setAge(5);

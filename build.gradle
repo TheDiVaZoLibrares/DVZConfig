@@ -7,7 +7,7 @@ plugins {
 }
 
 group = 'me.thedivazo.libs'
-version = '1.1.1'
+version = '1.2.1'
 
 publishing {
     repositories {
@@ -36,8 +36,19 @@ allprojects {
 //            '-Xlint:unchecked',
 //            '-Xlint:deprecation'
     ]
-    compileJava.options.release.set 17
+    compileJava.options.release.set 16
     javadoc.options.encoding = 'UTF-8'
+
+    java {
+        sourceCompatibility = JavaVersion.VERSION_16
+        targetCompatibility = JavaVersion.VERSION_16
+    }
+
+    java {
+        toolchain {
+            languageVersion = JavaLanguageVersion.of(16)
+        }
+    }
 
     repositories {
         mavenLocal()
@@ -65,6 +76,12 @@ subprojects {
     archivesBaseName = "${rootProject.name}-${project.name}"
 
     dependencies {
+        compileOnly("org.projectlombok:lombok:1.18.38")
+        annotationProcessor("org.projectlombok:lombok:1.18.38")
+
+        testCompileOnly("org.projectlombok:lombok:1.18.38")
+        testAnnotationProcessor("org.projectlombok:lombok:1.18.38")
+
         checkerFramework 'org.checkerframework:checker:3.49.0'
         implementation 'org.checkerframework:checker-qual:3.49.0'
     }

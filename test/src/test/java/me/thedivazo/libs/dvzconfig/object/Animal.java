@@ -32,9 +32,13 @@ import org.spongepowered.configurate.objectmapping.ConfigSerializable;
 @ConfigSerializable
 @NoArgsConstructor
 @Getter
-@Setter
 @EqualsAndHashCode
 public class Animal {
+    @Setter
     private String name;
+
+    @Setter
     private int age;
+
+    protected transient String type;
 }

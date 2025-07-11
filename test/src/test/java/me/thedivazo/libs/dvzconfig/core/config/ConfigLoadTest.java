@@ -20,7 +20,6 @@
 package me.thedivazo.libs.dvzconfig.core.config;
 
 import me.thedivazo.libs.dvzconfig.core.manager.ConfigManagerImpl;
-import me.thedivazo.libs.dvzconfig.core.serializer.ForFieldsClassSerializer;
 import me.thedivazo.libs.dvzconfig.core.serializer.ForIdClassSerializer;
 import me.thedivazo.libs.dvzconfig.object.*;
 import me.thedivazo.libs.dvzconfig.yaml.YamlConfigLoader;
@@ -49,7 +48,6 @@ class ConfigLoadTest {
     private static YamlConfigLoader yamlConfigLoader;
     private static ConfigurationLoader<CommentedConfigurationNode> configurationLoader;
     private static ForIdClassSerializer<Animal, String> animalNameSerializer;
-    private static ForFieldsClassSerializer<Reward> rewardSerializer;
     private static ConfigContainer container;
     private static Path path;
 
@@ -68,13 +66,9 @@ class ConfigLoadTest {
                         "cow", Cow.class
                 )
         );
-
-        rewardSerializer = new ForFieldsClassSerializer<>(Reward.class, Set.of(RewardItem.class, RewardEffect.class));
-
         yamlConfigLoader = new YamlConfigLoader(
                 NodeStyle.BLOCK, 4, TypeSerializerCollection.defaults().childBuilder()
                 .register(Animal.class, animalNameSerializer)
-                .register(Reward.class, rewardSerializer)
                 .build()
         );
 
